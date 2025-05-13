@@ -1,0 +1,16 @@
+
+<val-list title=":Значение|:Описание" value-style=backtick-quote>
+
+- none
+Пустое/отсутствующее значение.
+
+- left
+left-hand operator.
+
+- right
+right-hand operator.
+
+</val-list>
+
+Значения являются независимыми от регистра символов.
+

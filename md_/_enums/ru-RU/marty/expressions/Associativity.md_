@@ -1,0 +1,25 @@
+# marty::expressions::Associativity перечисление
+
+Базовый тип: `std::uint32_t`.
+
+Operator associativity.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- none
+0x00
+Пустое/отсутствующее значение.
+
+- left
+0x01
+left-hand operator.
+
+- right
+0x02
+right-hand operator.
+
+</val-list>

@@ -1,0 +1,57 @@
+# marty::expressions::OperatorArity flags
+
+Underlying type: `std::uint32_t`.
+
+Operators arity - unary, binary.
+
+<val-list title=":Name|:Value|:Description">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Invalid/unknown value.
+
+- none,nonary
+0x00
+Zero number of operands.
+
+- unary
+0x01
+Unary operator.
+
+- binary
+0x02
+Binary operator.
+
+- ternary
+0x04
+Ternary operator.
+
+- nAry
+0x08
+N-arity.
+
+- prefix
+0x10
+Prefix mode allowed for operator.
+
+- postfix
+0x20
+Postfix mode allowed for operator.
+
+- unaryBinary
+unary  | binary
+Unary or binary operator.
+
+- prefixPostfix,prepostMask
+prefix | postfix
+Mask to pick out pre/post flags.
+
+- fixedArityMask
+unary | binary | ternary
+Mask to pick out fixed size arity.
+
+- arityMask
+fixedArityMask | nAry
+Mask to pick out arity.
+
+</val-list>

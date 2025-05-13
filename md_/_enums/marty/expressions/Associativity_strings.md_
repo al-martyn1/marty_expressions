@@ -1,0 +1,16 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- none
+Empty/none value.
+
+- left
+left-hand operator.
+
+- right
+right-hand operator.
+
+</val-list>
+
+Values are case insensitive.
+

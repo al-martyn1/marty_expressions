@@ -1,0 +1,57 @@
+# marty::expressions::OperatorArity флаги
+
+Базовый тип: `std::uint32_t`.
+
+Operators arity - unary, binary, ternary etc. Also holds prefix/postfix attribute for unary operators.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- none,nonary
+0x00
+Пустое/отсутствующее значение.
+
+- unary
+0x01
+Unary operator. Mutually exclusive with `ternary` and `nAry` flags.
+
+- binary
+0x02
+Binary operator. Mutually exclusive with `ternary` and `nAry` flags.
+
+- ternary
+0x04
+Ternary operator. Mutually exclusive with other arity flags.
+
+- nAry
+0x08
+N-arity. Mutually exclusive with other arity flags.
+
+- prefix
+0x10
+Prefix mode allowed for operator.
+
+- postfix
+0x20
+Postfix mode allowed for operator.
+
+- unaryBinary
+unary  | binary
+Unary or binary operator.
+
+- prefixPostfix,prepostMask
+prefix | postfix
+Mask to pick out pre/post flags.
+
+- fixedArityMask
+unary | binary | ternary
+Mask to pick out fixed size arity.
+
+- arityMask
+fixedArityMask | nAry
+Mask to pick out arity.
+
+</val-list>

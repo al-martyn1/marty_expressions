@@ -1,0 +1,18 @@
+{
+  "en-US": {
+    "_generated-enums_/marty/expressions/associativity": {
+      "___description___": ""
+    },
+    "_generated-enums_/marty/expressions/operatorarity": {
+      "___description___": "Operators arity - unary, binary",
+      "aritymask": "Mask to pick out arity.",
+      "binary": "Binary operator.",
+      "nary": "N-arity.",
+      "none": "Zero number of operands.",
+      "prefixpostfix": "Mask to pick out pre/post flags.",
+      "ternary": "Ternary operator.",
+      "unary": "Unary operator.",
+      "unarybinary": "Unary or binary operator."
+    }
+  }
+}

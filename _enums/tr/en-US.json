@@ -1,0 +1,23 @@
+{
+  "en-US": {
+    "_generated-enums_/marty/expressions/associativity": {
+      "___description___": "Operator associativity",
+      "left": "left-hand operator.",
+      "right": "right-hand operator."
+    },
+    "_generated-enums_/marty/expressions/operatorarity": {
+      "___description___": "Operators arity - unary, binary, ternary etc. Also holds prefix/postfix attribute for unary operators.",
+      "aritymask": "Mask to pick out arity.",
+      "binary": "Binary operator. Mutually exclusive with `ternary` and `nAry` flags.",
+      "fixedaritymask": "Mask to pick out fixed size arity.",
+      "nary": "N-arity. Mutually exclusive with other arity flags.",
+      "none": "Zero number of operands.",
+      "postfix": "Postfix mode allowed for operator.",
+      "prefix": "Prefix mode allowed for operator.",
+      "prefixpostfix": "Mask to pick out pre/post flags.",
+      "ternary": "Ternary operator. Mutually exclusive with other arity flags.",
+      "unary": "Unary operator. Mutually exclusive with `ternary` and `nAry` flags.",
+      "unarybinary": "Unary or binary operator."
+    }
+  }
+}

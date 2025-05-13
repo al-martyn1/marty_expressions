@@ -1,0 +1,15 @@
+none                = 0
+opPlus              
+opMinus             
+opIncrement
+opDecrement
+opAnd               
+opOr                
+opXor               
+opNot               
+opShiftLeft         
+opShiftRight        
+opMul               
+opDiv               
+opLogicalNot        
+opComma
