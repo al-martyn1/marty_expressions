@@ -5,6 +5,20 @@
 #pragma once
 
 
+#include "marty_decimal/marty_decimal.h"
+
+#include "enums.h"
+
+//
+#include <vector>
+#include <cstddef>
+#include <functional>
+#include <string>
+#include <type_traits>
+#include <tuple>
+#include <variant>
+#include <vector>
+#include <memory>
 
 //
 #include "undef_min_max.h"
@@ -15,17 +29,41 @@
 namespace marty {
 namespace expressions {
 
+/*
+    Что у нас может быть в качестве входного токена?
 
-// https://en.wikipedia.org/wiki/Arity
-// https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%90%D1%80%D0%BD%D0%BE%D1%81%D1%82%D1%8C
-// https://ru.wikipedia.org/wiki/%D0%90%D1%80%D0%BD%D0%BE%D1%81%D1%82%D1%8C
+    - Целое число - std::uint64_t - беззнаковое, 
+      но в качестве результата выражения беззнаковое может превратиться в знаковое, поэтому надо завернуть
+      в структуру, в которой также храним знак.
+      Вообще, хорошо бы сделать отдельный тип BigInt, по типу Decimal, но пока обойдусь
 
-enum class OperatorArity
+*/
+
+
+/*
+enum OperatorType
 {
-    unaryOp       = 1,
-    binaryOp      = 2,
-    unaryBinaryOp = 3
+    opOperator
+    opFunction
+
 };
+
+template<typename OpTokenType, typename StringType>
+struct ExpressionNode
+{
+    OperatorArity                  arity; //! Арность оператора - unary, binary, ternary или nAry - только эти значения
+
+    OperatorType                   operatorType   ;
+    OpTokenType                    opToken        ; // operatorType==opOperator
+    std::vector<StringType>        opFunctionName ; // operatorType==opFunction
+
+
+    std::vector<ExpressionNode>    args;
+
+
+};
+*/
+
 
 
 } // namespace expressions
