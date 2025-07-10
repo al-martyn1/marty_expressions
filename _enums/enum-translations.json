@@ -6,16 +6,6 @@
       "none": "Returned for non-bracket symbols.",
       "open": "Open bracket."
     },
-    "_generated-enums_/marty/expressions/brackettype": {
-      "___description___": "Brackets functionality flags",
-      "functionalcast": "Functional cast.",
-      "functioncall": "Function call.",
-      "groupping": "Operations groupping for priority raising.",
-      "indexation": "Indexation.",
-      "none": "Returned for non-bracket symbols.",
-      "simplecast": "Simple (C-like) cast.",
-      "templateinstantiation": "Template instantiation."
-    },
     "_generated-enums_/marty/expressions/operatoraffixation": {
       "___description___": "Operator affixation. Prefixation, infixation, suffixation -> affixation. Affix - https://ru.wikipedia.org/wiki/%D0%90%D1%84%D1%84%D0%B8%D0%BA%D1%81, https://en.wikipedia.org/wiki/Affix",
       "postfix": "Postfix mode allowed for operator.",
@@ -33,7 +23,7 @@
       "unarybinary": "Unary or binary operator."
     },
     "_generated-enums_/marty/expressions/operatorassociativity": {
-      "___description___": "Operator associativity. Ассоциативность (от лат. associatio) — свойство операций, позволяющее восстановить последовательность их выполнения при отсутствии явных указаний на очерёдность при равном приоритете",
+      "___description___": "Operator associativity. Ассоциативность (от лат. associatio) — свойство операций, позволяющее восстановить последовательность их выполнения при отсутствии явных указаний на очерёдность при равном приоритете - left - приоритетнее",
       "left": "left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.",
       "right": "right-hand operator (Right-to-left ←) правая ассоциативность — справа налево."
     },

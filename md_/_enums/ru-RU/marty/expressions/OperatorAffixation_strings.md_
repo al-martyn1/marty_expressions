@@ -1,0 +1,13 @@
+
+<val-list title=":Значение|:Описание" value-style=backtick-quote>
+
+- prefix
+Prefix mode allowed for operator.
+
+- postfix
+Postfix mode allowed for operator.
+
+</val-list>
+
+Значения являются независимыми от регистра символов.
+

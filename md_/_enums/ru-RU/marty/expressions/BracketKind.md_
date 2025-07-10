@@ -1,0 +1,25 @@
+# marty::expressions::BracketKind перечисление
+
+Базовый тип: `std::uint32_t`.
+
+Brackets functionality.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- none
+0x00
+Пустое/отсутствующее значение.
+
+- open
+0x01
+Open bracket.
+
+- close
+0x02
+Close bracket.
+
+</val-list>

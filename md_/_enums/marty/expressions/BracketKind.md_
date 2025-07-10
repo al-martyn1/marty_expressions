@@ -1,0 +1,25 @@
+# marty::expressions::BracketKind enumeration
+
+Underlying type: `std::uint32_t`.
+
+Brackets functionality.
+
+<val-list title=":Name|:Value|:Description">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Invalid/unknown value.
+
+- none
+0x00
+Returned for non-bracket symbols.
+
+- open
+0x01
+Open bracket.
+
+- close
+0x02
+Close bracket.
+
+</val-list>

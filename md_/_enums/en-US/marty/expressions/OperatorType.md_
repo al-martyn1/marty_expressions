@@ -1,0 +1,45 @@
+# marty::expressions::OperatorType flags
+
+Underlying type: `std::uint32_t`.
+
+Operator type.
+
+<val-list title=":Name|:Value|:Description">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Invalid/unknown value.
+
+- none
+0x00
+Empty/none value.
+
+- regular
+0x01
+`-`
+
+- groupping
+0x02
+Operations groupping for priority raising.
+
+- simpleCast
+0x04
+Simple (C-like) cast.
+
+- functionalCast
+0x08
+Functional cast.
+
+- functionCall
+0x10
+Function call.
+
+- indexation
+0x20
+Indexation.
+
+- templateInstantiation
+0x40
+Template instantiation.
+
+</val-list>

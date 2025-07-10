@@ -1,0 +1,16 @@
+
+<val-list title=":Значение|:Описание" value-style=backtick-quote>
+
+- none
+Пустое/отсутствующее значение.
+
+- open
+Open bracket.
+
+- close
+Close bracket.
+
+</val-list>
+
+Значения являются независимыми от регистра символов.
+

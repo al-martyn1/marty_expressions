@@ -1,0 +1,28 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- regular
+`-`
+
+- groupping
+Operations groupping for priority raising.
+
+- simple-cast,simple_cast,simplecast
+Simple (C-like) cast.
+
+- functional-cast,functional_cast,functionalcast
+Functional cast.
+
+- function-call,function_call,functioncall
+Function call.
+
+- indexation
+Indexation.
+
+- template-instantiation,template_instantiation,templateinstantiation
+Template instantiation.
+
+</val-list>
+
+Values are case insensitive.
+

@@ -1,0 +1,45 @@
+# marty::expressions::OperatorType флаги
+
+Базовый тип: `std::uint32_t`.
+
+Operator type.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- none
+0x00
+Пустое/отсутствующее значение.
+
+- regular
+0x01
+`-`
+
+- groupping
+0x02
+Operations groupping for priority raising.
+
+- simpleCast
+0x04
+Simple (C-like) cast.
+
+- functionalCast
+0x08
+Functional cast.
+
+- functionCall
+0x10
+Function call.
+
+- indexation
+0x20
+Indexation.
+
+- templateInstantiation
+0x40
+Template instantiation.
+
+</val-list>

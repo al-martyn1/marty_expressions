@@ -1,0 +1,16 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- none
+Returned for non-bracket symbols.
+
+- open
+Open bracket.
+
+- close
+Close bracket.
+
+</val-list>
+
+Values are case insensitive.
+

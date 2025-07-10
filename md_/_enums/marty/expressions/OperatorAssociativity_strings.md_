@@ -1,0 +1,13 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- left
+left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.
+
+- right
+right-hand operator (Right-to-left ←) правая ассоциативность — справа налево.
+
+</val-list>
+
+Values are case insensitive.
+

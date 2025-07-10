@@ -1,0 +1,13 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- prefix
+Prefix mode allowed for operator.
+
+- postfix
+Postfix mode allowed for operator.
+
+</val-list>
+
+Values are case insensitive.
+
