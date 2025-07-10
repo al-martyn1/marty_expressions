@@ -1,4 +1,4 @@
-# marty::expressions::OperatorType flags
+# marty::expressions::OperatorFeatures flags
 
 Underlying type: `std::uint32_t`.
 

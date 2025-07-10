@@ -1,8 +1,8 @@
-# marty::expressions::Associativity перечисление
+# marty::expressions::Error перечисление
 
 Базовый тип: `std::uint32_t`.
 
-Operator associativity.
+Error codes.
 
 <val-list title=":Имя|:Значение|:Описание">
 
@@ -10,16 +10,8 @@ Operator associativity.
 (std::uint32_t)(-1)
 Недопустимое/неизвестное значение.
 
-- none
+- none,no,ok,noError
 0x00
 Пустое/отсутствующее значение.
-
-- left
-0x01
-left-hand operator.
-
-- right
-0x02
-right-hand operator.
 
 </val-list>

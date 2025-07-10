@@ -1,4 +1,4 @@
-# marty::expressions::OperatorType флаги
+# marty::expressions::OperatorFeatures флаги
 
 Базовый тип: `std::uint32_t`.
 

@@ -1,14 +1,8 @@
 
 <val-list title=":Значение|:Описание" value-style=backtick-quote>
 
-- none
+- no,no-error,no_error,noerror,none,ok
 Пустое/отсутствующее значение.
-
-- left
-left-hand operator.
-
-- right
-right-hand operator.
 
 </val-list>
 

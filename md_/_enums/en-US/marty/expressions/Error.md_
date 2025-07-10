@@ -1,0 +1,17 @@
+# marty::expressions::Error enumeration
+
+Underlying type: `std::uint32_t`.
+
+Error codes.
+
+<val-list title=":Name|:Value|:Description">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Invalid/unknown value.
+
+- none,no,ok,noError
+0x00
+No error - all is OK.
+
+</val-list>
