@@ -40,8 +40,11 @@ umba-tr --lang-tag-format=langTag --overwrite --scan=./tr --include-files=*.json
 
 
 umba-enum-gen %TR% %MD% %GEN_OPTS% %HEX2% %TPL_OVERRIDE% %SNIPPETOPTIONS_GEN_FLAGS%    ^
-    %UINT32% %HEX2% -E=Associativity            -F=@Associativity.txt                  ^
+    %UINT32% %HEX2% -E=BracketKind              -F=@BracketKind.txt                    ^
     %FLAGS% %FLAGENUM_EXTRA%                                                           ^
+    %UINT32% %HEX2% -E=OperatorType             -F=@OperatorType.txt                   ^
+    %UINT32% %HEX2% -E=OperatorAffixation       -F=@OperatorAffixation.txt             ^
+    %UINT32% %HEX2% -E=OperatorAssociativity    -F=@OperatorAssociativity.txt          ^
     %UINT32% %HEX2% -E=OperatorArity            -F=@OperatorArity.txt                  ^
 ..\enums.h
 

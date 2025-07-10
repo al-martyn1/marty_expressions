@@ -30,3 +30,34 @@
 
 #endif
 
+
+#if !defined(USE_MARTY_BIGINT)
+    #define USE_MARTY_BIGINT 1
+#endif
+
+#if !defined(USE_MARTY_DECIMAL)
+    #define USE_MARTY_DECIMAL 1
+#endif
+
+
+#if defined(USE_MARTY_BIGINT) && USE_MARTY_BIGINT!=0
+    #include "marty_bigint/marty_bigint.h"
+    #if !defined(MARTY_EXPRESSIONS_MARTY_BIGINT_USED)
+        #define MARTY_EXPRESSIONS_MARTY_BIGINT_USED
+    #endif
+#else
+    #if defined(MARTY_EXPRESSIONS_MARTY_BIGINT_USED)
+        #undef MARTY_EXPRESSIONS_MARTY_BIGINT_USED
+    #endif
+#endif
+
+#if defined(USE_MARTY_DECIMAL) && USE_MARTY_DECIMAL!=0
+    #include "marty_decimal/marty_decimal.h"
+    #if !defined(MARTY_EXPRESSIONS_MARTY_DECIMAL_USED)
+        #define MARTY_EXPRESSIONS_MARTY_DECIMAL_USED
+    #endif
+#else
+    #if defined(MARTY_EXPRESSIONS_MARTY_DECIMAL_USED)
+        #undef MARTY_EXPRESSIONS_MARTY_DECIMAL_USED
+    #endif
+#endif

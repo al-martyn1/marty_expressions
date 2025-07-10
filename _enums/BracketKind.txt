@@ -1,0 +1,6 @@
+// Brackets functionality
+
+unknown,invalid             = -1   // !
+none                        =  0   // Returned for non-bracket symbols
+open                               // Open bracket
+close                              // Close bracket

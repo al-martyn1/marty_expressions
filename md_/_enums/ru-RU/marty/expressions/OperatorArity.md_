@@ -16,11 +16,11 @@ Operators arity - unary, binary, ternary etc. Also holds prefix/postfix attribut
 
 - unary
 0x01
-Unary operator. Mutually exclusive with `ternary` and `nAry` flags.
+Unary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `binary`.
 
 - binary
 0x02
-Binary operator. Mutually exclusive with `ternary` and `nAry` flags.
+Binary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `unary`.
 
 - ternary
 0x04
@@ -30,21 +30,9 @@ Ternary operator. Mutually exclusive with other arity flags.
 0x08
 N-arity. Mutually exclusive with other arity flags.
 
-- prefix
-0x10
-Prefix mode allowed for operator.
-
-- postfix
-0x20
-Postfix mode allowed for operator.
-
 - unaryBinary
 unary  | binary
 Unary or binary operator.
-
-- prefixPostfix,prepostMask
-prefix | postfix
-Mask to pick out pre/post flags.
 
 - fixedArityMask
 unary | binary | ternary

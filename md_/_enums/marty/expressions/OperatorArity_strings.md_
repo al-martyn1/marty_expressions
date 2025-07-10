@@ -5,28 +5,19 @@
 Zero number of operands.
 
 - unary
-Unary operator.
+Unary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `binary`.
 
 - binary
-Binary operator.
+Binary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `unary`.
 
 - ternary
-Ternary operator.
+Ternary operator. Mutually exclusive with other arity flags.
 
 - n-ary,n_ary,nary
-N-arity.
-
-- prefix
-Prefix mode allowed for operator.
-
-- postfix
-Postfix mode allowed for operator.
+N-arity. Mutually exclusive with other arity flags.
 
 - unary-binary,unary_binary,unarybinary
 Unary or binary operator.
-
-- prefix-postfix,prefix_postfix,prefixpostfix,prepost-mask,prepost_mask,prepostmask
-Mask to pick out pre/post flags.
 
 - fixed-arity-mask,fixed_arity_mask,fixedaritymask
 Mask to pick out fixed size arity.

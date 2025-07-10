@@ -1,7 +1,0 @@
-// Operator associativity
-
-unknown,invalid             = -1   // !
-
-none
-left                               // left-hand operator
-right                              // right-hand operator

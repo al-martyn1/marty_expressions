@@ -23,35 +23,166 @@ namespace marty{
 namespace expressions{
 
 
-/*! Operator associativity */
-//#!Associativity
-enum class Associativity : std::uint32_t
+/*! Brackets functionality */
+//#!BracketKind
+enum class BracketKind : std::uint32_t
 {
     unknown   = (std::uint32_t)(-1) /*!< ! */,
     invalid   = (std::uint32_t)(-1) /*!< ! */,
-    none      = 0x00 /*!<  */,
-    left      = 0x01 /*!< left-hand operator */,
-    right     = 0x02 /*!< right-hand operator */
+    none      = 0x00 /*!< Returned for non-bracket symbols */,
+    open      = 0x01 /*!< Open bracket */,
+    close     = 0x02 /*!< Close bracket */
 
 }; // enum 
 //#!
 
-MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(Associativity)
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(BracketKind)
 
-MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Associativity, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Associativity::unknown   , "Unknown" );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Associativity::none      , "None"    );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Associativity::left      , "Left"    );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Associativity::right     , "Right"   );
-MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Associativity, std::map, 1 )
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( BracketKind, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BracketKind::open      , "Open"    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BracketKind::unknown   , "Unknown" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BracketKind::close     , "Close"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( BracketKind::none      , "None"    );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( BracketKind, std::map, 1 )
 
-MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Associativity, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Associativity::unknown   , "unknown" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Associativity::unknown   , "invalid" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Associativity::none      , "none"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Associativity::left      , "left"    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Associativity::right     , "right"   );
-MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Associativity, std::map, 1 )
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( BracketKind, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BracketKind::open      , "open"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BracketKind::unknown   , "unknown" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BracketKind::unknown   , "invalid" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BracketKind::close     , "close"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( BracketKind::none      , "none"    );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( BracketKind, std::map, 1 )
+
+
+
+/*! Operator type */
+//#!OperatorType
+enum class OperatorType : std::uint32_t
+{
+    unknown                 = (std::uint32_t)(-1) /*!< ! */,
+    invalid                 = (std::uint32_t)(-1) /*!< ! */,
+    none                    = 0x00 /*!< ! */,
+    regular                 = 0x01 /*!<  */,
+    groupping               = 0x02 /*!< Operations groupping for priority raising */,
+    simpleCast              = 0x04 /*!< Simple (C-like) cast */,
+    functionalCast          = 0x08 /*!< Functional cast */,
+    functionCall            = 0x10 /*!< Function call */,
+    indexation              = 0x20 /*!< Indexation */,
+    templateInstantiation   = 0x40 /*!< Template instantiation */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_FLAGS(OperatorType)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorType, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::unknown                 , "Unknown"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::functionalCast          , "FunctionalCast"        );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::none                    , "None"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::regular                 , "Regular"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::groupping               , "Groupping"             );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::simpleCast              , "SimpleCast"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::indexation              , "Indexation"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::functionCall            , "FunctionCall"          );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::templateInstantiation   , "TemplateInstantiation" );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorType, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorType, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::unknown                 , "unknown"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::unknown                 , "invalid"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functional-cast"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functional_cast"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functionalcast"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::none                    , "none"                   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::regular                 , "regular"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::groupping               , "groupping"              );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simple-cast"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simple_cast"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simplecast"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::indexation              , "indexation"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "function-call"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "function_call"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "functioncall"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "template-instantiation" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "template_instantiation" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "templateinstantiation"  );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorType, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorType, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorType, std::set)
+
+
+
+/*! Operator affixation. Prefixation, infixation, suffixation -> affixation. Affix - https://ru.wikipedia.org/wiki/%D0%90%D1%84%D1%84%D0%B8%D0%BA%D1%81, https://en.wikipedia.org/wiki/Affix */
+//#!OperatorAffixation
+enum class OperatorAffixation : std::uint32_t
+{
+    unknown   = (std::uint32_t)(-1) /*!< ! */,
+    invalid   = (std::uint32_t)(-1) /*!< ! */,
+    none      = 0x00 /*!< ! */,
+    prefix    = 0x01 /*!< Prefix mode allowed for operator */,
+    postfix   = 0x02 /*!< Postfix mode allowed for operator */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_FLAGS(OperatorAffixation)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorAffixation, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAffixation::prefix    , "Prefix"  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAffixation::unknown   , "Unknown" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAffixation::none      , "None"    );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAffixation::postfix   , "Postfix" );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorAffixation, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorAffixation, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAffixation::prefix    , "prefix"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAffixation::unknown   , "unknown" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAffixation::unknown   , "invalid" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAffixation::none      , "none"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAffixation::postfix   , "postfix" );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorAffixation, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorAffixation, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorAffixation, std::set)
+
+
+
+/*! Operator associativity. Ассоциативность (от лат. associatio) — свойство операций, позволяющее восстановить последовательность их выполнения при отсутствии явных указаний на очерёдность при равном приоритете - left - приоритетнее */
+//#!OperatorAssociativity
+enum class OperatorAssociativity : std::uint32_t
+{
+    unknown   = (std::uint32_t)(-1) /*!< ! */,
+    invalid   = (std::uint32_t)(-1) /*!< ! */,
+    none      = 0x00 /*!< ! */,
+    left      = 0x01 /*!< left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо */,
+    right     = 0x02 /*!< right-hand operator (Right-to-left ←) правая ассоциативность — справа налево */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_FLAGS(OperatorAssociativity)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorAssociativity, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::unknown   , "Unknown" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::none      , "None"    );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::left      , "Left"    );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::right     , "Right"   );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorAssociativity, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorAssociativity, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown   , "unknown" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown   , "invalid" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::none      , "none"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::left      , "left"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::right     , "right"   );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorAssociativity, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorAssociativity, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorAssociativity, std::set)
 
 
 
@@ -63,17 +194,13 @@ enum class OperatorArity : std::uint32_t
     invalid          = (std::uint32_t)(-1) /*!< ! */,
     none             = 0x00 /*!< Zero number of operands */,
     nonary           = 0x00 /*!< Zero number of operands */,
-    unary            = 0x01 /*!< Unary operator. Mutually exclusive with `ternary` and `nAry` flags. */,
-    binary           = 0x02 /*!< Binary operator. Mutually exclusive with `ternary` and `nAry` flags. */,
+    unary            = 0x01 /*!< Unary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `binary`. */,
+    binary           = 0x02 /*!< Binary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `unary`. */,
     ternary          = 0x04 /*!< Ternary operator. Mutually exclusive with other arity flags. */,
     nAry             = 0x08 /*!< N-arity. Mutually exclusive with other arity flags. */,
-    prefix           = 0x10 /*!< Prefix mode allowed for operator */,
-    postfix          = 0x20 /*!< Postfix mode allowed for operator */,
     unaryBinary      = unary  | binary /*!< Unary or binary operator */,
-    prefixPostfix    = prefix | postfix /*!< Prefix or postfix form allowed */,
     fixedArityMask   = unary | binary | ternary /*!< Mask to pick out fixed size arity */,
-    arityMask        = fixedArityMask | nAry /*!< Mask to pick out arity */,
-    prepostMask      = prefix | postfix /*!< Mask to pick out pre/post flags */
+    arityMask        = fixedArityMask | nAry /*!< Mask to pick out arity */
 
 }; // enum 
 //#!
@@ -81,22 +208,18 @@ enum class OperatorArity : std::uint32_t
 MARTY_CPP_MAKE_ENUM_FLAGS(OperatorArity)
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorArity, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::prefix           , "Prefix"         );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::unknown          , "Unknown"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::none             , "None"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::ternary          , "Ternary"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::unary            , "Unary"          );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::binary           , "Binary"         );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::nAry             , "NAry"           );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::arityMask        , "ArityMask"      );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::postfix          , "Postfix"        );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::unaryBinary      , "UnaryBinary"    );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::prefixPostfix    , "PrefixPostfix"  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::nAry             , "NAry"           );
     MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::fixedArityMask   , "FixedArityMask" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorArity::arityMask        , "ArityMask"      );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorArity, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorArity, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefix           , "prefix"           );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unknown          , "unknown"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unknown          , "invalid"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::none             , "none"             );
@@ -104,25 +227,18 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorArity, std::map, 1 )
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::ternary          , "ternary"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unary            , "unary"            );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::binary           , "binary"           );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "n-ary"            );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "n_ary"            );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "nary"             );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "arity-mask"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "arity_mask"       );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "aritymask"        );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::postfix          , "postfix"          );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unaryBinary      , "unary-binary"     );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unaryBinary      , "unary_binary"     );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::unaryBinary      , "unarybinary"      );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prepost_mask"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prefix-postfix"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prefix_postfix"   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prefixpostfix"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prepost-mask"     );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::prefixPostfix    , "prepostmask"      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "n-ary"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "n_ary"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::nAry             , "nary"             );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::fixedArityMask   , "fixed-arity-mask" );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::fixedArityMask   , "fixed_arity_mask" );
     MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::fixedArityMask   , "fixedaritymask"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "arity-mask"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "arity_mask"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorArity::arityMask        , "aritymask"        );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorArity, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorArity, std::set)

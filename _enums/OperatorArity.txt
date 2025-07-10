@@ -8,17 +8,12 @@ unknown,invalid             = -1   // !
 
 none,nonary                 = 0    // Zero number of operands
 
-unary                              // Unary operator. Mutually exclusive with `ternary` and `nAry` flags.
-binary                             // Binary operator. Mutually exclusive with `ternary` and `nAry` flags.
+unary                              // Unary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `binary`.
+binary                             // Binary operator. Mutually exclusive with `ternary` and `nAry` flags. Can be combined with `unary`.
 ternary                            // Ternary operator. Mutually exclusive with other arity flags.
 nAry                               // N-arity. Mutually exclusive with other arity flags.
 
-prefix                             // Prefix mode allowed for operator
-postfix                            // Postfix mode allowed for operator
-
 unaryBinary   = unary  | binary    // Unary or binary operator
-prefixPostfix = prefix | postfix   // Prefix or postfix form allowed
 
 fixedArityMask     = unary | binary | ternary // Mask to pick out fixed size arity
 arityMask          = fixedArityMask | nAry    // Mask to pick out arity
-prepostMask        = prefix | postfix         // Mask to pick out pre/post flags
