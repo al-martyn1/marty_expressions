@@ -12,6 +12,34 @@ Invalid/unknown value.
 
 - none,no,ok,noError
 0x00
-No error - all is OK.
+no error - all is OK.
+
+- unknownParserState
+0x01
+parser is in an unknown state.
+
+- notImplemented
+0x02
+feature not implemented.
+
+- gotNonUnaryOrNonPrefixOp
+0x03
+got non-unary or non-prefix operator.
+
+- gotNonUnaryOp
+0x04
+got non-unary operator.
+
+- gotNonPrefixOp
+0x05
+got non-prefix operator.
+
+- gotOperator
+0x06
+got operator.
+
+- gotUnaryNonPostfixOp
+0x07
+got unary non-prefix operator.
 
 </val-list>

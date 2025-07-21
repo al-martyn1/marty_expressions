@@ -14,11 +14,11 @@ Invalid/unknown value.
 0x00
 Empty/none value.
 
-- left
+- leftToRight,leftHand,left
 0x01
 left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.
 
-- right
+- rightToLeft,rightHand,right
 0x02
 right-hand operator (Right-to-left ←) правая ассоциативность — справа налево.
 

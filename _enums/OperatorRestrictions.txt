@@ -1,0 +1,16 @@
+// Operator type
+
+unknown,invalid             = -1   // !
+none                        =  0   // !
+
+requiresNameRight                  // Requires name (identifier) at right
+requiresNameLeft                   // Requires name (identifier) at left
+requiresScopeRight                 // Requires scope operator at right
+requiresScopeLeft                  // Requires scope operator at left
+
+requiresScopeOrNameRight = requiresNameRight|requiresScopeRight  // Requires scope operator or name (identifier) at right
+requiresScopeOrNameLeft  = requiresNameLeft|requiresScopeLeft    // Requires scope operator or name (identifier) at left
+
+
+
+

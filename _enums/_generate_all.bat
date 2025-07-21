@@ -38,13 +38,26 @@
 umba-tr --help > umba-tr-help.txt
 umba-tr --lang-tag-format=langTag --overwrite --scan=./tr --include-files=*.json enum-translations.json >umba-tr.log 2>&1
 
+@set INPUT=^
+%UINT32% %HEX2% -E=BracketKind              -F=@BracketKind.txt                    ^
+%UINT32% %HEX2% -E=Error                    -F=@Error.txt                          ^
+%UINT32% %HEX2% -E=ParserState              -F=@ParserState.txt                    ^
+%UINT32% %HEX2% -E=ItemType                 -F=@ItemType.txt                       ^
+%UINT32% %HEX2% -E=TokenContext             -F=@TokenContext.txt                   ^
+%FLAGS% %FLAGENUM_EXTRA%                                                           ^
+%UINT32% %HEX2% -E=OperatorFeatures         -F=@OperatorFeatures.txt               ^
+%UINT32% %HEX2% -E=OperatorRestrictions     -F=@OperatorRestrictions.txt           ^
+%UINT32% %HEX2% -E=OperatorAffixation       -F=@OperatorAffixation.txt             ^
+%UINT32% %HEX2% -E=OperatorAssociativity    -F=@OperatorAssociativity.txt          ^
+%UINT32% %HEX2% -E=OperatorArity            -F=@OperatorArity.txt
 
-umba-enum-gen %TR% %MD% %GEN_OPTS% %HEX2% %TPL_OVERRIDE% %SNIPPETOPTIONS_GEN_FLAGS%    ^
-    %UINT32% %HEX2% -E=BracketKind              -F=@BracketKind.txt                    ^
-    %FLAGS% %FLAGENUM_EXTRA%                                                           ^
-    %UINT32% %HEX2% -E=OperatorType             -F=@OperatorType.txt                   ^
-    %UINT32% %HEX2% -E=OperatorAffixation       -F=@OperatorAffixation.txt             ^
-    %UINT32% %HEX2% -E=OperatorAssociativity    -F=@OperatorAssociativity.txt          ^
-    %UINT32% %HEX2% -E=OperatorArity            -F=@OperatorArity.txt                  ^
+
+umba-enum-gen %TR% %MD% %GEN_OPTS% %HEX2% %TPL_OVERRIDE% %SNIPPETOPTIONS_GEN_FLAGS% ^
+    %INPUT%                                                                         ^
 ..\enums.h
 
+@rem %TR% %MD%
+umba-enum-gen %GEN_OPTS% %HEX2% %TPL_OVERRIDE% %SNIPPETOPTIONS_GEN_FLAGS% ^
+    --template=description-map                                                      ^
+    %INPUT%                                                                         ^
+..\enum_descriptions.h

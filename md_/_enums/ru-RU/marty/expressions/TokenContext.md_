@@ -1,0 +1,21 @@
+# marty::expressions::TokenContext перечисление
+
+Базовый тип: `std::uint32_t`.
+
+Conntext of token usage.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- normal
+0x00
+Parser is in normal state.
+
+- functionCall
+0x01
+Parser is currently parsing function call arguments list.
+
+</val-list>

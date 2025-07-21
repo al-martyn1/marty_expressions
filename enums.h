@@ -55,62 +55,345 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( BracketKind, std::map, 1 )
 
 
 
+/*! Error codes */
+//#!Error
+enum class Error : std::uint32_t
+{
+    unknown                    = (std::uint32_t)(-1) /*!< ! */,
+    invalid                    = (std::uint32_t)(-1) /*!< ! */,
+    none                       = 0x00 /*!< no error - all is OK */,
+    no                         = 0x00 /*!< no error - all is OK */,
+    ok                         = 0x00 /*!< no error - all is OK */,
+    noError                    = 0x00 /*!< no error - all is OK */,
+    unknownParserState         = 0x01 /*!< parser is in an unknown state */,
+    notImplemented             = 0x02 /*!< feature not implemented */,
+    gotNonUnaryOrNonPrefixOp   = 0x03 /*!< got non-unary or non-prefix operator */,
+    gotNonUnaryOp              = 0x04 /*!< got non-unary operator */,
+    gotNonPrefixOp             = 0x05 /*!< got non-prefix operator */,
+    gotOperator                = 0x06 /*!< got operator */,
+    gotUnaryNonPostfixOp       = 0x07 /*!< got unary non-prefix operator */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(Error)
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Error, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknown                    , "Unknown"                  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::none                       , "None"                     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknownParserState         , "UnknownParserState"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::notImplemented             , "NotImplemented"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "GotNonUnaryOrNonPrefixOp" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOp              , "GotNonUnaryOp"            );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonPrefixOp             , "GotNonPrefixOp"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotOperator                , "GotOperator"              );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "GotUnaryNonPostfixOp"     );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Error, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Error, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                    , "unknown"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                    , "invalid"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "none"                           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no"                             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no_error"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "ok"                             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no-error"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "noerror"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknown-parser-state"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknown_parser_state"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknownparserstate"             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "not-implemented"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "not_implemented"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "notimplemented"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "got-non-unary-or-non-prefix-op" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "got_non_unary_or_non_prefix_op" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "gotnonunaryornonprefixop"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "got-non-unary-op"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "got_non_unary_op"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "gotnonunaryop"                  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "got-non-prefix-op"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "got_non_prefix_op"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "gotnonprefixop"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "got-operator"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "got_operator"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "gotoperator"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "got-unary-non-postfix-op"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "got_unary_non_postfix_op"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "gotunarynonpostfixop"           );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Error, std::map, 1 )
+
+
+
+/*! Parser states */
+//#!ParserState
+enum class ParserState : std::uint32_t
+{
+    unknown                      = (std::uint32_t)(-1) /*!< !Unknown parser state */,
+    invalid                      = (std::uint32_t)(-1) /*!< !Unknown parser state */,
+    waitUnaryPrefixOpOrValue     = 0x00 /*!< unary prefix operator, variable, function or literal */,
+    initial                      = 0x00 /*!< unary prefix operator, variable, function or literal */,
+    waitOperator                 = 0x01 /*!< unary postfix operator, binary, ternary or n-Ary operator */,
+    waitOperatorOrFunctionCall   = 0x02 /*!< binary, ternary or n-Ary operator or function call */,
+    waitOperand                  = 0x03 /*!< operand (literal or variable) */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(ParserState)
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ParserState, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ParserState::unknown                      , "Unknown"                    );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ParserState::waitUnaryPrefixOpOrValue     , "WaitUnaryPrefixOpOrValue"   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ParserState::waitOperator                 , "WaitOperator"               );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ParserState::waitOperand                  , "WaitOperand"                );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ParserState::waitOperatorOrFunctionCall   , "WaitOperatorOrFunctionCall" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ParserState, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ParserState, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::unknown                      , "unknown"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::unknown                      , "invalid"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitUnaryPrefixOpOrValue     , "initial"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitUnaryPrefixOpOrValue     , "wait-unary-prefix-op-or-value"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitUnaryPrefixOpOrValue     , "wait_unary_prefix_op_or_value"  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitUnaryPrefixOpOrValue     , "waitunaryprefixoporvalue"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperator                 , "wait-operator"                  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperator                 , "wait_operator"                  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperator                 , "waitoperator"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperand                  , "wait-operand"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperand                  , "wait_operand"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperand                  , "waitoperand"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperatorOrFunctionCall   , "wait-operator-or-function-call" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperatorOrFunctionCall   , "wait_operator_or_function_call" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ParserState::waitOperatorOrFunctionCall   , "waitoperatororfunctioncall"     );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ParserState, std::map, 1 )
+
+
+
+/*! Error codes */
+//#!ItemType
+enum class ItemType : std::uint32_t
+{
+    unknown                = (std::uint32_t)(-1) /*!< ! */,
+    invalid                = (std::uint32_t)(-1) /*!< ! */,
+    void_                  = 0x00 /*!<  */,
+    operator_              = 0x01 /*!<  */,
+    boolLiteral            = 0x02 /*!<  */,
+    integerLiteral         = 0x03 /*!<  */,
+    floatingPointLiteral   = 0x04 /*!<  */,
+    stringLiteral          = 0x05 /*!<  */,
+    symbolLiteral          = 0x06 /*!<  */,
+    identifier             = 0x07 /*!<  */,
+    expressionEntry        = 0x08 /*!<  */,
+    functionCall           = 0x09 /*!<  */,
+    functionalCast         = 0x0A /*!<  */,
+    cast                   = 0x0B /*!<  */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(ItemType)
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( ItemType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::unknown                , "Unknown"              );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::symbolLiteral          , "SymbolLiteral"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::void_                  , "Void"                 );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::operator_              , "Operator"             );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::integerLiteral         , "IntegerLiteral"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::boolLiteral            , "BoolLiteral"          );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::floatingPointLiteral   , "FloatingPointLiteral" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::stringLiteral          , "StringLiteral"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::identifier             , "Identifier"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::expressionEntry        , "ExpressionEntry"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::functionCall           , "FunctionCall"         );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::functionalCast         , "FunctionalCast"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( ItemType::cast                   , "Cast"                 );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( ItemType, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( ItemType, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::unknown                , "unknown"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::unknown                , "invalid"                );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::symbolLiteral          , "symbol-literal"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::symbolLiteral          , "symbol_literal"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::symbolLiteral          , "symbolliteral"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::void_                  , "void"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::operator_              , "operator"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::integerLiteral         , "integer-literal"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::integerLiteral         , "integer_literal"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::integerLiteral         , "integerliteral"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::boolLiteral            , "bool-literal"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::boolLiteral            , "bool_literal"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::boolLiteral            , "boolliteral"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::floatingPointLiteral   , "floating-point-literal" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::floatingPointLiteral   , "floatingpointliteral"   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::floatingPointLiteral   , "floating_point_literal" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::stringLiteral          , "string-literal"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::stringLiteral          , "string_literal"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::stringLiteral          , "stringliteral"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::identifier             , "identifier"             );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::expressionEntry        , "expression-entry"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::expressionEntry        , "expression_entry"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::expressionEntry        , "expressionentry"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionCall           , "function-call"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionCall           , "function_call"          );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionCall           , "functioncall"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionalCast         , "functional-cast"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionalCast         , "functional_cast"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::functionalCast         , "functionalcast"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( ItemType::cast                   , "cast"                   );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( ItemType, std::map, 1 )
+
+
+
+/*! Conntext of token usage */
+//#!TokenContext
+enum class TokenContext : std::uint32_t
+{
+    unknown        = (std::uint32_t)(-1) /*!< ! */,
+    invalid        = (std::uint32_t)(-1) /*!< ! */,
+    normal         = 0x00 /*!< Parser is in normal state */,
+    functionCall   = 0x01 /*!< Parser is currently parsing function call arguments list */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(TokenContext)
+
+MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( TokenContext, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( TokenContext::unknown        , "Unknown"      );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( TokenContext::normal         , "Normal"       );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( TokenContext::functionCall   , "FunctionCall" );
+MARTY_CPP_ENUM_CLASS_SERIALIZE_END( TokenContext, std::map, 1 )
+
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( TokenContext, std::map, 1 )
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::unknown        , "unknown"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::unknown        , "invalid"       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::normal         , "normal"        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::functionCall   , "function-call" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::functionCall   , "function_call" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( TokenContext::functionCall   , "functioncall"  );
+MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( TokenContext, std::map, 1 )
+
+
+
 /*! Operator type */
-//#!OperatorType
-enum class OperatorType : std::uint32_t
+//#!OperatorFeatures
+enum class OperatorFeatures : std::uint32_t
 {
     unknown                 = (std::uint32_t)(-1) /*!< ! */,
     invalid                 = (std::uint32_t)(-1) /*!< ! */,
     none                    = 0x00 /*!< ! */,
     regular                 = 0x01 /*!<  */,
-    groupping               = 0x02 /*!< Operations groupping for priority raising */,
-    simpleCast              = 0x04 /*!< Simple (C-like) cast */,
-    functionalCast          = 0x08 /*!< Functional cast */,
-    functionCall            = 0x10 /*!< Function call */,
-    indexation              = 0x20 /*!< Indexation */,
-    templateInstantiation   = 0x40 /*!< Template instantiation */
+    scope                   = 0x02 /*!< Scope resolution operator */,
+    groupping               = 0x04 /*!< Operations groupping for priority raising */,
+    simpleCast              = 0x08 /*!< Simple (C-like) cast */,
+    functionalCast          = 0x10 /*!< Functional cast */,
+    functionCall            = 0x20 /*!< Function call */,
+    indexation              = 0x40 /*!< Indexation */,
+    templateInstantiation   = 0x80 /*!< Template instantiation */
 
 }; // enum 
 //#!
 
-MARTY_CPP_MAKE_ENUM_FLAGS(OperatorType)
+MARTY_CPP_MAKE_ENUM_FLAGS(OperatorFeatures)
 
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorType, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::unknown                 , "Unknown"               );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::functionalCast          , "FunctionalCast"        );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::none                    , "None"                  );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::regular                 , "Regular"               );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::groupping               , "Groupping"             );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::simpleCast              , "SimpleCast"            );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::indexation              , "Indexation"            );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::functionCall            , "FunctionCall"          );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorType::templateInstantiation   , "TemplateInstantiation" );
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorType, std::map, 1 )
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorFeatures, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::unknown                 , "Unknown"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::functionalCast          , "FunctionalCast"        );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::scope                   , "Scope"                 );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::none                    , "None"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::regular                 , "Regular"               );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::groupping               , "Groupping"             );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::indexation              , "Indexation"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::simpleCast              , "SimpleCast"            );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::functionCall            , "FunctionCall"          );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorFeatures::templateInstantiation   , "TemplateInstantiation" );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorFeatures, std::map, 1 )
 
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorType, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::unknown                 , "unknown"                );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::unknown                 , "invalid"                );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functional-cast"        );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functional_cast"        );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionalCast          , "functionalcast"         );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::none                    , "none"                   );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::regular                 , "regular"                );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::groupping               , "groupping"              );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simple-cast"            );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simple_cast"            );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::simpleCast              , "simplecast"             );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::indexation              , "indexation"             );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "function-call"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "function_call"          );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::functionCall            , "functioncall"           );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "template-instantiation" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "template_instantiation" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorType::templateInstantiation   , "templateinstantiation"  );
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorType, std::map, 1 )
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorFeatures, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::unknown                 , "unknown"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::unknown                 , "invalid"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionalCast          , "functional-cast"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionalCast          , "functional_cast"        );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionalCast          , "functionalcast"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::scope                   , "scope"                  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::none                    , "none"                   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::regular                 , "regular"                );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::groupping               , "groupping"              );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::indexation              , "indexation"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::simpleCast              , "simple-cast"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::simpleCast              , "simple_cast"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::simpleCast              , "simplecast"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionCall            , "function-call"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionCall            , "function_call"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::functionCall            , "functioncall"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::templateInstantiation   , "template-instantiation" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::templateInstantiation   , "template_instantiation" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorFeatures::templateInstantiation   , "templateinstantiation"  );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorFeatures, std::map, 1 )
 
-MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorType, std::set)
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorFeatures, std::set)
 
-MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorType, std::set)
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorFeatures, std::set)
+
+
+
+/*! Operator type */
+//#!OperatorRestrictions
+enum class OperatorRestrictions : std::uint32_t
+{
+    unknown                    = (std::uint32_t)(-1) /*!< ! */,
+    invalid                    = (std::uint32_t)(-1) /*!< ! */,
+    none                       = 0x00 /*!< ! */,
+    requiresNameRight          = 0x01 /*!< Requires name (identifier) at right */,
+    requiresNameLeft           = 0x02 /*!< Requires name (identifier) at left */,
+    requiresScopeRight         = 0x04 /*!< Requires scope operator at right */,
+    requiresScopeLeft          = 0x08 /*!< Requires scope operator at left */,
+    requiresScopeOrNameRight   = requiresNameRight|requiresScopeRight /*!< Requires scope operator or name (identifier) at right */,
+    requiresScopeOrNameLeft    = requiresNameLeft|requiresScopeLeft /*!< Requires scope operator or name (identifier) at left */
+
+}; // enum 
+//#!
+
+MARTY_CPP_MAKE_ENUM_FLAGS(OperatorRestrictions)
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorRestrictions, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameRight   , "RequiresScopeOrNameRight" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::unknown                    , "Unknown"                  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresNameLeft           , "RequiresNameLeft"         );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::none                       , "None"                     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameLeft    , "RequiresScopeOrNameLeft"  );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresNameRight          , "RequiresNameRight"        );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresScopeRight         , "RequiresScopeRight"       );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorRestrictions::requiresScopeLeft          , "RequiresScopeLeft"        );
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorRestrictions, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorRestrictions, std::map, 1 )
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameRight   , "requires-scope-or-name-right" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameRight   , "requiresscopeornameright"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameRight   , "requires_scope_or_name_right" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::unknown                    , "unknown"                      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::unknown                    , "invalid"                      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameLeft           , "requires-name-left"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameLeft           , "requires_name_left"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameLeft           , "requiresnameleft"             );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::none                       , "none"                         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameLeft    , "requires-scope-or-name-left"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameLeft    , "requiresscopeornameleft"      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeOrNameLeft    , "requires_scope_or_name_left"  );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameRight          , "requires-name-right"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameRight          , "requires_name_right"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresNameRight          , "requiresnameright"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeRight         , "requires-scope-right"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeRight         , "requiresscoperight"           );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeRight         , "requires_scope_right"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeLeft          , "requires-scope-left"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeLeft          , "requiresscopeleft"            );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorRestrictions::requiresScopeLeft          , "requires_scope_left"          );
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorRestrictions, std::map, 1 )
+
+MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorRestrictions, std::set)
+
+MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorRestrictions, std::set)
 
 
 
@@ -154,11 +437,15 @@ MARTY_CPP_ENUM_FLAGS_DESERIALIZE_SET(OperatorAffixation, std::set)
 //#!OperatorAssociativity
 enum class OperatorAssociativity : std::uint32_t
 {
-    unknown   = (std::uint32_t)(-1) /*!< ! */,
-    invalid   = (std::uint32_t)(-1) /*!< ! */,
-    none      = 0x00 /*!< ! */,
-    left      = 0x01 /*!< left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо */,
-    right     = 0x02 /*!< right-hand operator (Right-to-left ←) правая ассоциативность — справа налево */
+    unknown       = (std::uint32_t)(-1) /*!< ! */,
+    invalid       = (std::uint32_t)(-1) /*!< ! */,
+    none          = 0x00 /*!< ! */,
+    leftToRight   = 0x01 /*!< left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо */,
+    leftHand      = 0x01 /*!< left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо */,
+    left          = 0x01 /*!< left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо */,
+    rightToLeft   = 0x02 /*!< right-hand operator (Right-to-left ←) правая ассоциативность — справа налево */,
+    rightHand     = 0x02 /*!< right-hand operator (Right-to-left ←) правая ассоциативность — справа налево */,
+    right         = 0x02 /*!< right-hand operator (Right-to-left ←) правая ассоциативность — справа налево */
 
 }; // enum 
 //#!
@@ -166,18 +453,30 @@ enum class OperatorAssociativity : std::uint32_t
 MARTY_CPP_MAKE_ENUM_FLAGS(OperatorAssociativity)
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_BEGIN( OperatorAssociativity, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::unknown   , "Unknown" );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::none      , "None"    );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::left      , "Left"    );
-    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::right     , "Right"   );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "LeftToRight" );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::unknown       , "Unknown"     );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::none          , "None"        );
+    MARTY_CPP_ENUM_FLAGS_SERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "RightToLeft" );
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_END( OperatorAssociativity, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_BEGIN( OperatorAssociativity, std::map, 1 )
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown   , "unknown" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown   , "invalid" );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::none      , "none"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::left      , "left"    );
-    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::right     , "right"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "left-to-right" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "lefthand"      );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "left_to_right" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "lefttoright"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "left-hand"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "left"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::leftToRight   , "left_hand"     );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown       , "unknown"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::unknown       , "invalid"       );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::none          , "none"          );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "right"         );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "right-to-left" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "right_to_left" );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "righttoleft"   );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "right-hand"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "right_hand"    );
+    MARTY_CPP_ENUM_FLAGS_DESERIALIZE_ITEM( OperatorAssociativity::rightToLeft   , "righthand"     );
 MARTY_CPP_ENUM_FLAGS_DESERIALIZE_END( OperatorAssociativity, std::map, 1 )
 
 MARTY_CPP_ENUM_FLAGS_SERIALIZE_SET(OperatorAssociativity, std::set)

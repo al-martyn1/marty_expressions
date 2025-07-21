@@ -1,0 +1,13 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- normal
+Parser is in normal state.
+
+- function-call,function_call,functioncall
+Parser is currently parsing function call arguments list.
+
+</val-list>
+
+Values are case insensitive.
+

@@ -1,0 +1,5 @@
+// Conntext of token usage
+
+unknown,invalid             = -1   // !
+normal                      =  0   // Parser is in normal state
+functionCall                       // Parser is currently parsing function call arguments list

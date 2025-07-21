@@ -1,0 +1,61 @@
+# marty::expressions::ItemType перечисление
+
+Базовый тип: `std::uint32_t`.
+
+Error codes.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- void_
+0x00
+`-`
+
+- operator_
+0x01
+`-`
+
+- boolLiteral
+0x02
+`-`
+
+- integerLiteral
+0x03
+`-`
+
+- floatingPointLiteral
+0x04
+`-`
+
+- stringLiteral
+0x05
+`-`
+
+- symbolLiteral
+0x06
+`-`
+
+- identifier
+0x07
+`-`
+
+- expressionEntry
+0x08
+`-`
+
+- functionCall
+0x09
+`-`
+
+- functionalCast
+0x0A
+`-`
+
+- cast
+0x0B
+`-`
+
+</val-list>

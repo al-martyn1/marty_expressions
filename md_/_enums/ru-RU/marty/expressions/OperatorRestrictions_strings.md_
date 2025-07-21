@@ -1,0 +1,25 @@
+
+<val-list title=":Значение|:Описание" value-style=backtick-quote>
+
+- requires-name-right,requires_name_right,requiresnameright
+Requires name (identifier) at right.
+
+- requires-name-left,requires_name_left,requiresnameleft
+Requires name (identifier) at left.
+
+- requires-scope-right,requires_scope_right,requiresscoperight
+Requires scope operator at right.
+
+- requires-scope-left,requires_scope_left,requiresscopeleft
+Requires scope operator at left.
+
+- requires-scope-or-name-right,requires_scope_or_name_right,requiresscopeornameright
+Requires scope operator or name (identifier) at right.
+
+- requires-scope-or-name-left,requires_scope_or_name_left,requiresscopeornameleft
+Requires scope operator or name (identifier) at left.
+
+</val-list>
+
+Значения являются независимыми от регистра символов.
+

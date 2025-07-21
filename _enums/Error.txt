@@ -1,0 +1,11 @@
+// Error codes
+
+unknown,invalid             = -1   // !
+none,no,ok,noError          =  0   // no error - all is OK
+unknownParserState                 // parser is in an unknown state
+notImplemented                     // feature not implemented
+gotNonUnaryOrNonPrefixOp           // got non-unary or non-prefix operator
+gotNonUnaryOp                      // got non-unary operator
+gotNonPrefixOp                     // got non-prefix operator
+gotOperator                        // got operator
+gotUnaryNonPostfixOp               // got unary non-prefix operator

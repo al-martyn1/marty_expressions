@@ -1,0 +1,29 @@
+# marty::expressions::ParserState enumeration
+
+Underlying type: `std::uint32_t`.
+
+Parser states.
+
+<val-list title=":Name|:Value|:Description">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Invalid/unknown value.
+
+- waitUnaryPrefixOpOrValue,initial
+0x00
+unary prefix operator, variable, function or literal.
+
+- waitOperator
+0x01
+unary postfix operator, binary, ternary or n-Ary operator.
+
+- waitOperatorOrFunctionCall
+0x02
+binary, ternary or n-Ary operator or function call.
+
+- waitOperand
+0x03
+operand (literal or variable).
+
+</val-list>

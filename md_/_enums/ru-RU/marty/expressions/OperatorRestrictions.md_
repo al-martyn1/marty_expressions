@@ -1,0 +1,41 @@
+# marty::expressions::OperatorRestrictions флаги
+
+Базовый тип: `std::uint32_t`.
+
+Operator type.
+
+<val-list title=":Имя|:Значение|:Описание">
+
+- unknown,invalid
+(std::uint32_t)(-1)
+Недопустимое/неизвестное значение.
+
+- none
+0x00
+Пустое/отсутствующее значение.
+
+- requiresNameRight
+0x01
+Requires name (identifier) at right.
+
+- requiresNameLeft
+0x02
+Requires name (identifier) at left.
+
+- requiresScopeRight
+0x04
+Requires scope operator at right.
+
+- requiresScopeLeft
+0x08
+Requires scope operator at left.
+
+- requiresScopeOrNameRight
+requiresNameRight|requiresScopeRight
+Requires scope operator or name (identifier) at right.
+
+- requiresScopeOrNameLeft
+requiresNameLeft|requiresScopeLeft
+Requires scope operator or name (identifier) at left.
+
+</val-list>

@@ -4,6 +4,27 @@
 - no,no-error,no_error,noerror,none,ok
 Пустое/отсутствующее значение.
 
+- unknown-parser-state,unknown_parser_state,unknownparserstate
+parser is in an unknown state.
+
+- not-implemented,not_implemented,notimplemented
+feature not implemented.
+
+- got-non-unary-or-non-prefix-op,got_non_unary_or_non_prefix_op,gotnonunaryornonprefixop
+got non-unary or non-prefix operator.
+
+- got-non-unary-op,got_non_unary_op,gotnonunaryop
+got non-unary operator.
+
+- got-non-prefix-op,got_non_prefix_op,gotnonprefixop
+got non-prefix operator.
+
+- got-operator,got_operator,gotoperator
+got operator.
+
+- got-unary-non-postfix-op,got_unary_non_postfix_op,gotunarynonpostfixop
+got unary non-prefix operator.
+
 </val-list>
 
 Значения являются независимыми от регистра символов.

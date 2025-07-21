@@ -16,9 +16,13 @@
 
 @set EXCLUDE_DIRS=--batch-exclude-dir=_libs,libs,_lib,lib,tests,test,rc,_generators,_enums,conf,_distr_conf,doxy,src,_src,.msvc2019,boost,icons
 @set COMMON=--overwrite --copy-images
+@set COMMON=%COMMON% --warning=+graphviz
+@set COMMON=%COMMON% --info=+graphviz,+config
+@rem set COMMON=%COMMON% --copy-images=true
+@rem set COMMON=%COMMON% --batch-output-root="--graphviz-output-path=%~dp0"
 @rem 
 @set GRAPHVIZ_OPTIONS=
-@rem "--graphviz-output-path=%~dp0\..\doc\.generated_images"
+@set GRAPHVIZ_OPTIONS=%GRAPHVIZ_OPTIONS% "--graphviz-output-path=%~dp0\doc\.img"
 @rem
 @set LANG=--document-language=ru-RU
                                    
@@ -27,3 +31,7 @@
 umba-md-pp %OPTIONS%
 
 @umba-md-pp --help > umba-md-pp-help.txt 2>&1
+
+
+@rem warn "img-copy" / "img-copy-exist" / "same-file" / "plantuml" / "graphviz"
+@rem info "snippet-lookup"/ "plantuml" / "graphviz" / "opt-files" / "config" / "strip-extentions" / "page-index" / "meta-tags" / "auto-url"

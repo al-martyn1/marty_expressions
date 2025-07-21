@@ -7,6 +7,8 @@
 
 #include "enums.h"
 #include "defs.h"
+//
+#include "base_types.h"
 
 //
 #include <vector>
@@ -24,183 +26,11 @@
 
 
 
-#if defined(MARTY_EXPRESSIONS_MARTY_BIGINT_USED)
-    #define MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE    marty::BigInt
-#else
-    #define MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE    std::int64_t
-#endif
-
-#if defined(MARTY_EXPRESSIONS_MARTY_DECIMAL_USED)
-    #define MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE    marty::Decimal
-#else
-    #define MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE    double
-#endif
-
-
-#if !defined(MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE)
-    #define MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE    std::string
-#endif
-
-
-
 // #include "marty_expressions/types.h"
 // marty::expressions::
 namespace marty {
 namespace expressions {
 
-
-
-template<typename PositionInfoType>
-struct BoolLiteral
-{
-    PositionInfoType     positionInfo;
-    bool                 value;
-
-}; // BoolLiteral
-
-
-template<typename PositionInfoType, typename IntegerType=MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct IntegerLiteral
-{
-    PositionInfoType     positionInfo;
-    IntegerType          value;
-    StringType           suffix;
-
-    // bool isNegative() const { return negSign; }
-
-}; // IntegerLiteral
-
-
-template<typename PositionInfoType, typename FloatingPointType=MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct FloatingPointLiteral
-{
-    PositionInfoType     positionInfo;
-    FloatingPointType    value;
-    StringType           suffix;
-
-    // bool isNegative() const { return value.sign()<0; }
-
-}; // FloatingPointLiteral
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct StringLiteral
-{
-    PositionInfoType     positionInfo;
-    StringType           value;
-    StringType           suffix;
-
-}; // StringLiteral
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct SymbolLiteral
-{
-    PositionInfoType     positionInfo;
-    StringType           value;
-    StringType           suffix;
-
-}; // SymbolLiteral
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct IdentifierLiteral
-{
-    PositionInfoType     positionInfo;
-    StringType           value;
-
-}; // IdentifierLiteral
-
-
-template<typename PositionInfoType, typename OperatorTokenType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct OperatorToken
-{
-    PositionInfoType     positionInfo;
-    OperatorTokenType    value;
-    StringType           text;
-
-}; // OperatorToken
-
-
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct FunctionCall
-{
-    PositionInfoType     positionInfo;
-    StringType           value; // function name
-
-}; // FunctionCall
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct FunctionalCast
-{
-    PositionInfoType     positionInfo;
-    StringType           value; // type name
-
-}; // FunctionalCast
-
-
-// C-style cast
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct Cast
-{
-    PositionInfoType     positionInfo;
-    StringType           value; // type name
-
-}; // Cast
-
-
-template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-struct VoidValue
-{
-    PositionInfoType     positionInfo;
-    StringType           value; // for uniformity
-
-}; // VoidValue
-
-
-
-//----------------------------------------------------------------------------
-template< typename PositionInfoType
-        , typename OperatorTokenType
-        , typename IntegerType       =MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
-        , typename FloatingPointType =MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
-        , typename StringType        =MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
-        >
-using ExpressionInputItem = std::variant< OperatorToken<PositionInfoType, OperatorTokenType, StringType>
-                                        , BoolLiteral<PositionInfoType>
-                                        , IntegerLiteral<PositionInfoType, IntegerType, StringType>
-                                        , FloatingPointLiteral<PositionInfoType, FloatingPointType, StringType>
-                                        , StringLiteral<PositionInfoType, StringType>
-                                        , SymbolLiteral<PositionInfoType, StringType>
-                                        , IdentifierLiteral<PositionInfoType, StringType>
-                                        >;
-
-//----------------------------------------------------------------------------
-
-
-
-//----------------------------------------------------------------------------
-template< typename PositionInfoType
-        , typename OperatorTokenType
-        , typename IntegerType       = MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
-        , typename FloatingPointType = MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
-        , typename StringType        = MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
-        >
-using ExpressionItem = std::variant< OperatorToken<PositionInfoType, OperatorTokenType, StringType>
-                                   , BoolLiteral<PositionInfoType>
-                                   , IntegerLiteral<PositionInfoType, IntegerType>
-                                   , FloatingPointLiteral<PositionInfoType, FloatingPointType>
-                                   , StringLiteral<PositionInfoType, StringType>
-                                   , SymbolLiteral<PositionInfoType, StringType>
-                                   , IdentifierLiteral<PositionInfoType, StringType>
-                                   , FunctionCall<PositionInfoType, StringType>
-                                   , FunctionalCast<PositionInfoType, StringType>
-                                   , Cast<PositionInfoType, StringType>
-                                   , VoidValue<PositionInfoType, StringType>
-                                   >;
 //----------------------------------------------------------------------------
 
 
@@ -222,7 +52,15 @@ struct ExpressionNode
                                              >;
 
 
-    ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатором - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или OperatorToken - количество аргументов зависит от оператора
+    ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатором - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
+
+    // Требуются для вычисления значения выражения, передаются в вычислитель
+    // В зависимости от формы - префиксная/постфиксная, а также арности операции могут
+    // производится по-разному.
+    OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
+    OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
+
+    // associativity - right/left не требуется для вычисления выражения, она используется только для вычисления порядка операндов
 
     std::vector<ExpressionNode>   argList;
 
@@ -233,25 +71,34 @@ struct ExpressionNode
 
 
 //----------------------------------------------------------------------------
+// Информация об операторе для стека операторов
 template< typename PositionInfoType
         , typename OperatorTokenType
         , typename IntegerType       = MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
         , typename FloatingPointType = MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
         , typename StringType        = MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
         >
-struct OperatorInfo
+struct OperationInfo
 {
-    using ExpressionItemType = 
-    ExpressionItem< PositionInfoType 
-                  , OperatorTokenType
-                  , IntegerType      
-                  , FloatingPointType
-                  , StringType       
-                  >;
 
-    ExpressionItemType    operatorItem;
+    // OperatorTokenType, содержащийся в OperatorType, может обозначать functionCall, functionalCast, cast
+    // Ещё надо бы хранить имя, если у нас хранится functionCall, functionalCast, cast
+    // using OperatorType = Operator<PositionInfoType, OperatorTokenType, StringType>;
 
-    OperatorType          operatorType = OperatorType::none; // none/regular/groupping/simpleCast/functionalCast/functionCall/indexation/templateInstantiation
+    using ExpressionItemType = ExpressionItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType>;
+
+
+    using IdentifierLiteralType = IdentifierLiteral<PositionInfoType, StringType>;
+
+    // OperatorType          opInfo;
+    ExpressionItemType       opInfo;
+    IdentifierLiteralType callableObjectName;
+
+    // Или таки хранить ExpressionItem? Ведь для операторов токены могут быть, а вот для callable сущностей токены могут быть не предусмотрены?
+
+    // Для не операторов (ExpressionEntry/FunctionCall/FunctionalCast/Cast/VoidValue)
+    // задаём какое-то значение?
+    OperatorFeatures      opFeatures = OperatorFeatures::none; // none/regular/groupping/simpleCast/functionalCast/functionCall/indexation/templateInstantiation
 
     // Для скобок
     BracketKind           bracketKind  = BracketKind::none; // none/open/close - если none, то не скобка, а обычный оператор
@@ -263,10 +110,39 @@ struct OperatorInfo
 
     OperatorTokenType     operatorPair = 0; // For ternary operators - second part separator, for brackets - bracket pair
 
-    int                   precedence   = 0; // Приоритет операцииб делаем int, задолбало всё выносить в параметры шаблона
+    int                   precedence   = 0; // Приоритет операции делаем int, задолбало всё выносить в параметры шаблона
+
+    std::size_t           argIdx       = 0;
+    std::size_t           argsNum      = std::size_t(-1); // любое число раз
 
 
-}; // struct OperatorInfo
+    int makeFullPrecedence() const
+    {
+        return (precedence<<1) + (associativity==OperatorTokenType::right ? 0 : 1);
+    }
+
+    // Если приоритет численно меньше, значит, операция приоритетнее
+    int precidenceCompare(const OperationInfo &other) const
+    {
+        auto fp  = makeFullPrecedence();
+        auto ofp = other.makeFullPrecedence();
+
+        if (fp<ofp)
+            return 1;
+
+        if (fp>ofp)
+            return -1;
+
+        return 0;
+    }
+
+    bool precedenceGreater  (const OperationInfo &other) const { return precidenceCompare(other)> 0; }
+    bool precedenceGreaterEq(const OperationInfo &other) const { return precidenceCompare(other)>=0; }
+    bool precedenceLess     (const OperationInfo &other) const { return precidenceCompare(other)< 0; }
+    bool precedenceLessEq   (const OperationInfo &other) const { return precidenceCompare(other)<=0; }
+
+
+}; // struct OperationInfo
 
 
 

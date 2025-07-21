@@ -18,28 +18,32 @@ Operator type.
 0x01
 `-`
 
-- groupping
+- scope
 0x02
+Scope resolution operator.
+
+- groupping
+0x04
 Operations groupping for priority raising.
 
 - simpleCast
-0x04
+0x08
 Simple (C-like) cast.
 
 - functionalCast
-0x08
+0x10
 Functional cast.
 
 - functionCall
-0x10
+0x20
 Function call.
 
 - indexation
-0x20
+0x40
 Indexation.
 
 - templateInstantiation
-0x40
+0x80
 Template instantiation.
 
 </val-list>

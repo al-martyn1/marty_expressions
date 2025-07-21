@@ -1,0 +1,19 @@
+
+<val-list title=":Значение|:Описание" value-style=backtick-quote>
+
+- initial,wait-unary-prefix-op-or-value,wait_unary_prefix_op_or_value,waitunaryprefixoporvalue
+unary prefix operator, variable, function or literal.
+
+- wait-operator,wait_operator,waitoperator
+unary postfix operator, binary, ternary or n-Ary operator.
+
+- wait-operator-or-function-call,wait_operator_or_function_call,waitoperatororfunctioncall
+binary, ternary or n-Ary operator or function call.
+
+- wait-operand,wait_operand,waitoperand
+operand (literal or variable).
+
+</val-list>
+
+Значения являются независимыми от регистра символов.
+

@@ -6,6 +6,20 @@
       "none": "Returned for non-bracket symbols.",
       "open": "Open bracket."
     },
+    "_generated-enums_/marty/expressions/error": {
+      "___description___": "Error codes",
+      "gotnonprefixop": "got non-prefix operator.",
+      "gotnonunaryop": "got non-unary operator.",
+      "gotnonunaryornonprefixop": "got non-unary or non-prefix operator.",
+      "gotoperator": "got operator.",
+      "gotunarynonpostfixop": "got unary non-prefix operator.",
+      "none": "no error - all is OK.",
+      "notimplemented": "feature not implemented.",
+      "unknownparserstate": "parser is in an unknown state."
+    },
+    "_generated-enums_/marty/expressions/itemtype": {
+      "___description___": "Error codes"
+    },
     "_generated-enums_/marty/expressions/operatoraffixation": {
       "___description___": "Operator affixation. Prefixation, infixation, suffixation -> affixation. Affix - https://ru.wikipedia.org/wiki/%D0%90%D1%84%D1%84%D0%B8%D0%BA%D1%81, https://en.wikipedia.org/wiki/Affix",
       "postfix": "Postfix mode allowed for operator.",
@@ -24,17 +38,39 @@
     },
     "_generated-enums_/marty/expressions/operatorassociativity": {
       "___description___": "Operator associativity. Ассоциативность (от лат. associatio) — свойство операций, позволяющее восстановить последовательность их выполнения при отсутствии явных указаний на очерёдность при равном приоритете - left - приоритетнее",
-      "left": "left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.",
-      "right": "right-hand operator (Right-to-left ←) правая ассоциативность — справа налево."
+      "lefttoright": "left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.",
+      "righttoleft": "right-hand operator (Right-to-left ←) правая ассоциативность — справа налево."
     },
-    "_generated-enums_/marty/expressions/operatortype": {
+    "_generated-enums_/marty/expressions/operatorfeatures": {
       "___description___": "Operator type",
       "functionalcast": "Functional cast.",
       "functioncall": "Function call.",
       "groupping": "Operations groupping for priority raising.",
       "indexation": "Indexation.",
+      "scope": "Scope resolution operator.",
       "simplecast": "Simple (C-like) cast.",
       "templateinstantiation": "Template instantiation."
+    },
+    "_generated-enums_/marty/expressions/operatorrestrictions": {
+      "___description___": "Operator type",
+      "requiresnameleft": "Requires name (identifier) at left.",
+      "requiresnameright": "Requires name (identifier) at right.",
+      "requiresscopeleft": "Requires scope operator at left.",
+      "requiresscopeornameleft": "Requires scope operator or name (identifier) at left.",
+      "requiresscopeornameright": "Requires scope operator or name (identifier) at right.",
+      "requiresscoperight": "Requires scope operator at right."
+    },
+    "_generated-enums_/marty/expressions/parserstate": {
+      "___description___": "Parser states",
+      "waitoperand": "operand (literal or variable).",
+      "waitoperator": "unary postfix operator, binary, ternary or n-Ary operator.",
+      "waitoperatororfunctioncall": "binary, ternary or n-Ary operator or function call.",
+      "waitunaryprefixoporvalue": "unary prefix operator, variable, function or literal."
+    },
+    "_generated-enums_/marty/expressions/tokencontext": {
+      "___description___": "Conntext of token usage",
+      "functioncall": "Parser is currently parsing function call arguments list.",
+      "normal": "Parser is in normal state."
     }
   }
 }

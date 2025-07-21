@@ -6,7 +6,7 @@
 
 #include "types.h"
 //
-#include "umba/tokenizer/tokenizer.h"
+#include "umba/tokenizer.h"
 //
 #include "undef_min_max.h"
 
@@ -24,62 +24,181 @@ struct SampleOperatorTraits
 {
     using PrecedenceType = unsigned;
 
-    // Надо уметь по типу токена оператора понимать, что это скобка, понимать - открывающая или нет (isBrace, isOpen).
+    constexpr
+    bool isNonToken(OperatorTokenType tokenType) const
+    {
+        return tokenType==0;
+    }
 
+    // constexpr OperatorTokenType getGrouppingToken() const      { return UMBA_TOKENIZER_TOKEN_EXPRESION; }
+    // constexpr OperatorTokenType getFunctionCallToken() const   { return UMBA_TOKENIZER_TOKEN_FUNCTION_CALL; }
+    // constexpr OperatorTokenType getFunctionalCastToken() const { return UMBA_TOKENIZER_TOKEN_FUNCTIONAL_CAST; }
+    // constexpr OperatorTokenType getSimpleCastToken() const     { return UMBA_TOKENIZER_TOKEN_SIMPLE_CAST; }
+
+// #define UMBA_TOKENIZER_TOKEN_EXPRESION                                                0x0011u
+// #define UMBA_TOKENIZER_TOKEN_FUNCTION_CALL                                            0x0012u
+// #define UMBA_TOKENIZER_TOKEN_FUNCTIONAL_CAST                                          0x0013u
+// #define UMBA_TOKENIZER_TOKEN_SIMPLE_CAST                                              0x0014u
+
+
+    constexpr
+    OperatorTokenType getNulToken() const
+    {
+        return UMBA_TOKENIZER_TOKEN_NUL;
+    }
+
+    // Надо уметь по типу токена оператора понимать, что это скобка, понимать - открывающая или нет (isBrace, isOpen).
 
     constexpr
     BracketKind getBracketKind(OperatorTokenType tokenType) const
     {
         return tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN
              ? BracketKind::open
+
              : tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE
              ? BracketKind::close
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN
              ? BracketKind::open
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE
              ? BracketKind::close
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN
              ? BracketKind::open
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE
              ? BracketKind::close
+
              : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN
              ? BracketKind::open
+
              : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE
              ? BracketKind::close
+
              : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN
              ? BracketKind::open
+
              : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE
              ? BracketKind::close
+
              : BracketKind::none
              ;
     }
 
     constexpr
-    OperatorType getOperatorType(OperatorTokenType tokenType) const
+    OperatorTokenType getBracketPair(OperatorTokenType tokenType) const
     {
         return tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN
-             ? OperatorType::functionalCast
+             ? UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE
+
              : tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE
-             ? OperatorType::functionalCast
+             ? UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN
-             ? OperatorType::functionalCast | OperatorType::simpleCast | OperatorType::functionCall | OperatorType::groupping
+             ? UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE
-             ? OperatorType::functionalCast | OperatorType::simpleCast | OperatorType::functionCall | OperatorType::groupping
+             ? UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN
-             ? OperatorType::templateInstantiation
+             ? UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE
+
              : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE
-             ? OperatorType::templateInstantiation
+             ? UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN
+
              : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN
-             ? OperatorType::indexation
+             ? UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE
+
              : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE
-             ? OperatorType::indexation
+             ? UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN
+
              : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN
-             ? OperatorType::indexation
+             ? UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE
+
              : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE
-             ? OperatorType::indexation
-             : OperatorType::regular
+             ? UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN
+
+             : 0
              ;
     }
+
+    // Ограничения для операторов
+    // Например:
+    //   - scope resolution operator ('::')
+    //     - унарный (префиксный) может быть только перед идентификатором
+    //     - бинарный может быть только после и перед идентификатором
+    //   - Инкремент/декремент ('++'/'--')
+    //     - префиксный может быть перед чем угодно, даже перед литералом - просто увеличивает/уменьшает значение литерала на единицу.
+    //       Если мы захотим, чтобы префиксный '++'/'--' также работал только для переменных, то мы зададим ограничение
+    //       на допустимость как scope оператора ('::'), так и идентификатора - если после scope оператора будет следовать что-то отличное
+    //       от идентификатора, то это будет обработано уже его собственными ограничениями.
+    //     - постфиксный может быть только после идентификатора - он увеличивает значение переменной, но возвращает предыдущее значение
+    //       этой переменной.
+    //       
+
+    constexpr
+    OperatorRestrictions getOperatorRestrictions(OperatorTokenType tokenType, OperatorAffixation affixation, OperatorArity arity) const
+    {
+        return tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SCOPE_RESOLUTION
+             ? ( (arity==OperatorArity::unary && affixation==OperatorAffixation::prefix) 
+                 ?                                          OperatorRestrictions::requiresNameRight 
+                 : OperatorRestrictions::requiresNameLeft | OperatorRestrictions::requiresNameRight
+               )
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_INCREMENT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_DECREMENT
+             ? ( affixation==OperatorAffixation::postfix
+               ? OperatorRestrictions::none // requiresNameLeft // постфиксная форма требует идентификатор перед оператором (а если скобки/функция, которые возвращают указатель, который разыменовывается? Пока не будем ставить данное ограничение)
+               : OperatorRestrictions::none // все остальное не требует никаких условий
+               )
+
+             : OperatorRestrictions::none // нет ограничений для всего прочего
+             ;
+
+    }
+
+
+    constexpr
+    OperatorFeatures getOperatorFeatures(OperatorTokenType tokenType) const
+    {
+        return tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN
+             ? OperatorFeatures::functionalCast
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE
+             ? OperatorFeatures::functionalCast
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN
+             ? OperatorFeatures::functionalCast | OperatorFeatures::simpleCast | OperatorFeatures::functionCall | OperatorFeatures::groupping
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE
+             ? OperatorFeatures::functionalCast | OperatorFeatures::simpleCast | OperatorFeatures::functionCall | OperatorFeatures::groupping
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN
+             ? OperatorFeatures::templateInstantiation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE
+             ? OperatorFeatures::templateInstantiation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN
+             ? OperatorFeatures::indexation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE
+             ? OperatorFeatures::indexation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN
+             ? OperatorFeatures::indexation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE
+             ? OperatorFeatures::indexation
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SCOPE_RESOLUTION
+             ? OperatorFeatures::scope
+
+             : OperatorFeatures::regular
+             ;
+    }
+
+
 
     // Очерёдность операций - https://ru.wikipedia.org/wiki/%D0%9E%D1%87%D0%B5%D1%80%D1%91%D0%B4%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D0%B9
 
@@ -90,7 +209,7 @@ struct SampleOperatorTraits
     //   лево-правостороннесть не роялит - она учитывается при обработке операторов с равным приоритетом
 
     // При вызове получения приоритета affixation и arity - не набор флагов, а только один из них
-    // В примере не поддерживаем плюсовое унарное умножение Indirection (dereference), и унарное битовое AND - Address-of
+    // В примере не поддерживаем плюсовое унарное умножение (indirection/dereference), и унарное битовое AND - Address-of
     constexpr
     PrecedenceType getOperatorPrecedence(OperatorTokenType tokenType, OperatorAffixation affixation, OperatorArity arity) const
     {
@@ -99,7 +218,7 @@ struct SampleOperatorTraits
                tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE ||
                tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN    || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE ||
                tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE
-             ? 0u
+             ? 2u // 0u
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SCOPE_RESOLUTION  /* a::b */
              ? 1u // Приоритет scope resolution operator'а не зависит ни от чего
@@ -186,7 +305,7 @@ struct SampleOperatorTraits
              ? OperatorArity::ternary
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_COMMA
-             ? OperatorArity::nAry
+             ? OperatorArity::binary // nAry - запятая - тоже бинарный оператор
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_ADDITION || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SUBTRACTION
                // || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_MULTIPLICATION || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_AND // Поддерживаем только binary форму
@@ -203,21 +322,26 @@ struct SampleOperatorTraits
     }
 
     // Валидно только для унарных операторов/для оператров, используемых в унарной форме, при наличии нескольких доступных форм
-    constexptr
+    constexpr
     OperatorAffixation getOperatorAffixation(OperatorTokenType tokenType) const 
     {
-        return tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_INCREMENT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_DECREMENT ||
+        return tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_INCREMENT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_DECREMENT
              ? OperatorAffixation::prefix | OperatorAffixation::postfix
+
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_NOT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_NOT
              ? OperatorAffixation::prefix
+
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_ADDITION || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SUBTRACTION
              ? OperatorAffixation::prefix
+
              // : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_MULTIPLICATION
              // ? OperatorAffixation::prefix
              // : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_AND
              // ? OperatorAffixation::prefix
+
              : tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN    || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE
              ? OperatorAffixation::prefix | OperatorAffixation::postfix // Индексация может быть как до, так и после имени - C/C++ правила
+
              : OperatorAffixation::none
              ;
     }
@@ -237,8 +361,8 @@ struct SampleOperatorTraits
 
     // left   // left-hand operator  (Left-to-right >) левая ассоциативность, при которой вычисление выражения происходит слева направо
     // right  // right-hand operator (Right-to-left <) правая ассоциативность — справа налево
-    constexptr
-    OperatorAssociativity getOperatorAssociativity(OperatorTokenType tokenType, OperatorAffixation affixation, OperatorArity arity)
+    constexpr
+    OperatorAssociativity getOperatorAssociativity(OperatorTokenType tokenType, OperatorAffixation affixation, OperatorArity arity) const
     {
         return tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_SCOPE_RESOLUTION  /* a::b */
              ? OperatorAssociativity::left

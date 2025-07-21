@@ -1,0 +1,18 @@
+// Error codes
+# Надо согласовать с порядком следования типов в ExpressionInputItem/ExpressionItem
+# тогда в getExpressionItemType не надо будет использовать std::is_same
+
+unknown,invalid             = -1   // !
+# none                        =  0   // 
+void
+operator
+boolLiteral
+integerLiteral
+floatingPointLiteral
+stringLiteral
+symbolLiteral
+identifier
+expressionEntry
+functionCall
+functionalCast
+cast

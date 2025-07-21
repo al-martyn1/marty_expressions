@@ -1,0 +1,9 @@
+// Parser states
+
+unknown,invalid             = -1   // !Unknown parser state
+
+waitUnaryPrefixOpOrValue,initial                = 0 // unary prefix operator, variable, function or literal
+waitOperator                                        // unary postfix operator, binary, ternary or n-Ary operator
+waitOperatorOrFunctionCall                          // binary, ternary or n-Ary operator or function call
+waitOperand                                         // operand (literal or variable)
+

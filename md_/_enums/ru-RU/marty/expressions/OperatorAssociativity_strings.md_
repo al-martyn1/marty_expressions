@@ -1,10 +1,10 @@
 
 <val-list title=":Значение|:Описание" value-style=backtick-quote>
 
-- left
+- left,left-hand,left-to-right,left_hand,left_to_right,lefthand,lefttoright
 left-hand operator  (Left-to-right →) левая ассоциативность, при которой вычисление выражения происходит слева направо.
 
-- right
+- right,right-hand,right-to-left,right_hand,right_to_left,righthand,righttoleft
 right-hand operator (Right-to-left ←) правая ассоциативность — справа налево.
 
 </val-list>

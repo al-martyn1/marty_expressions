@@ -271,7 +271,7 @@ checkConvertOperatorToken( ExpressionInputItem<PositionInfoType, OperatorTokenTy
                     else
                         operatorText = umba::tokenizer::utils::makeTokenText(tokenType, b, e);
 
-                    resItem = marty::expressions::OperatorToken<PositionInfoType,OperatorTokenType,StringType>{posInfo, tokenType, operatorText};
+                    resItem = marty::expressions::Operator<PositionInfoType,OperatorTokenType,StringType>{posInfo, tokenType, operatorText};
                     bRes = true;
                 }
                 , parsedData
@@ -408,11 +408,11 @@ mergeFullQualifiedIdents( const std::vector<ExpressionInputItem<PositionInfoType
                 st = stNormal;
             }
         }
-        else if (std::holds_alternative<OperatorToken<PositionInfoType,OperatorTokenType,StringType>>(i))
+        else if (std::holds_alternative<Operator<PositionInfoType,OperatorTokenType,StringType>>(i))
         {
             if (st==stNormal)
             {
-                const auto &opRef = std::get<OperatorToken<PositionInfoType,OperatorTokenType,StringType>>(i);
+                const auto &opRef = std::get<Operator<PositionInfoType,OperatorTokenType,StringType>>(i);
                 if (opRef.value==nsSepOperator)
                 {
                     // Создаём идентификатор, вместо текста - текст замены NS-разделителя, заданный параметром функции
@@ -427,7 +427,7 @@ mergeFullQualifiedIdents( const std::vector<ExpressionInputItem<PositionInfoType
             }
             else if (st==stWaitNsSep)
             {
-                const auto &opRef = std::get<OperatorToken<PositionInfoType,OperatorTokenType,StringType>>(i);
+                const auto &opRef = std::get<Operator<PositionInfoType,OperatorTokenType,StringType>>(i);
                 if (opRef.value==nsSepOperator)
                 {
                     std::get<IdentifierLiteral<PositionInfoType,StringType>>(resVec.back()).value.append(nsSepStr); // добавляем разделитель
@@ -441,7 +441,7 @@ mergeFullQualifiedIdents( const std::vector<ExpressionInputItem<PositionInfoType
             }
             else if (st==stWaitIdent)
             {
-                const auto &opRef = std::get<OperatorToken<PositionInfoType,OperatorTokenType,StringType>>(i);
+                const auto &opRef = std::get<Operator<PositionInfoType,OperatorTokenType,StringType>>(i);
                 if (opRef.value==nsSepOperator)
                 {
                     resVec.emplace_back(ExpressionInputItemType{IdentifierLiteral<PositionInfoType,StringType>{opRef.positionInfo, nsSepStr}}); // заменяем текст разделителя NS

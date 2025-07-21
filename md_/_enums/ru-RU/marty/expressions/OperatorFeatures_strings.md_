@@ -4,6 +4,9 @@
 - regular
 `-`
 
+- scope
+Scope resolution operator.
+
 - groupping
 Operations groupping for priority raising.
 

@@ -1,0 +1,43 @@
+
+<val-list title=":Value|:Description" value-style=backtick-quote>
+
+- void
+`-`
+
+- operator
+`-`
+
+- bool-literal,bool_literal,boolliteral
+`-`
+
+- integer-literal,integer_literal,integerliteral
+`-`
+
+- floating-point-literal,floating_point_literal,floatingpointliteral
+`-`
+
+- string-literal,string_literal,stringliteral
+`-`
+
+- symbol-literal,symbol_literal,symbolliteral
+`-`
+
+- identifier
+`-`
+
+- expression-entry,expression_entry,expressionentry
+`-`
+
+- function-call,function_call,functioncall
+`-`
+
+- functional-cast,functional_cast,functionalcast
+`-`
+
+- cast
+`-`
+
+</val-list>
+
+Values are case insensitive.
+
