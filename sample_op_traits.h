@@ -210,6 +210,7 @@ struct SampleOperatorTraits
 
     // При вызове получения приоритета affixation и arity - не набор флагов, а только один из них
     // В примере не поддерживаем плюсовое унарное умножение (indirection/dereference), и унарное битовое AND - Address-of
+    // UMBA_TOKENIZER_TOKEN_OPERATOR_POWER
     constexpr
     PrecedenceType getOperatorPrecedence(OperatorTokenType tokenType, OperatorAffixation affixation, OperatorArity arity) const
     {
@@ -234,6 +235,10 @@ struct SampleOperatorTraits
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_NOT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_NOT
              ? 3u
+
+             
+             : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_POWER
+             ? 5u // Возведение в степень - приоритет, как у мультипликативных операторов, но выезжает за счёт правоассоциативности
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_MULTIPLICATION
              // ? (arity==OperatorArity::unary ? 3u : 5u) // Унарное умножение - это Indirection (dereference)
@@ -378,6 +383,9 @@ struct SampleOperatorTraits
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_NOT || tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_NOT
              ? OperatorAssociativity::right
+
+             : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_POWER
+             ? OperatorAssociativity::right // Унарное умножение - Indirection (dereference) - не поддерживаем
 
              : tokenType==UMBA_TOKENIZER_TOKEN_OPERATOR_MULTIPLICATION
              // ? (arity==OperatorArity::unary ? 3u : 5u) // Унарное умножение - это Indirection (dereference)
