@@ -4,6 +4,9 @@
 - no,no-error,no_error,noerror,none,ok
 Пустое/отсутствующее значение.
 
+- error-parser-state,error_parser_state,errorparserstate
+parser already is in an eror state.
+
 - unknown-parser-state,unknown_parser_state,unknownparserstate
 parser is in an unknown state.
 
@@ -24,6 +27,39 @@ got operator.
 
 - got-unary-non-postfix-op,got_unary_non_postfix_op,gotunarynonpostfixop
 got unary non-prefix operator.
+
+- got-unexpected-variable,got_unexpected_variable,gotunexpectedvariable
+got unexpected variable.
+
+- got-unexpected-constant,got_unexpected_constant,gotunexpectedconstant
+got unexpected constant.
+
+- got-unexpected-operator,got_unexpected_operator,gotunexpectedoperator
+got unexpected operator.
+
+- got-unexpected-opening-parenthesis,got_unexpected_opening_parenthesis,gotunexpectedopeningparenthesis
+got unexpected opening parenthesis.
+
+- got-unexpected-closing-parenthesis,got_unexpected_closing_parenthesis,gotunexpectedclosingparenthesis
+got unexpected closing parenthesis.
+
+- got-unexpected-token,got_unexpected_token,gotunexpectedtoken
+got unexpected token.
+
+- got-unbalanced-parenthesis,got_unbalanced_parenthesis,gotunbalancedparenthesis
+got open/close parenthesis balance mismatch.
+
+- unexpected-end,unexpected_end,unexpectedend
+got unexpected end of expression.
+
+- parenthesis-balance-broken,parenthesis_balance_broken,parenthesisbalancebroken
+the balance of the parenthesis is broken.
+
+- missing-closing,missing_closing,missingclosing
+the balance of the parenthesis is broken.
+
+- something-goes-wrong,something_goes_wrong,somethinggoeswrong
+something goes wrong.
 
 </val-list>
 

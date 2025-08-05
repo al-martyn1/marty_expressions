@@ -117,8 +117,14 @@ struct Operator
 
 }; // Operator
 
+//----------------------------------------------------------------------------
+// Закончились допустимые входные типы 
+//----------------------------------------------------------------------------
 
 
+//----------------------------------------------------------------------------
+// Начинаются выходные типы
+//----------------------------------------------------------------------------
 // Для того, чтобы отделять отдельное подвыражение от остального - скобочное выражение
 template<typename PositionInfoType>
 struct ExpressionEntry
@@ -206,7 +212,7 @@ using ExpressionItem = std::variant< Operator<PositionInfoType, OperatorTokenTyp
                                    , StringLiteral<PositionInfoType, StringType>
                                    , SymbolLiteral<PositionInfoType, StringType>
                                    , IdentifierLiteral<PositionInfoType, StringType>
-                                   , ExpressionEntry<PositionInfoType>
+                                   //, ExpressionEntry<PositionInfoType>
                                    , FunctionCall<PositionInfoType, StringType>
                                    , FunctionalCast<PositionInfoType, StringType>
                                    , Cast<PositionInfoType, StringType>
@@ -235,7 +241,7 @@ ItemType getExpressionItemType(const ExpressionItem<PositionInfoType, OperatorTo
                            if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return ItemType::stringLiteral       ;
                            if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return ItemType::symbolLiteral       ;
                            if constexpr (std::is_same_v <ArgType, IdentifierLiteral<PositionInfoType, StringType>           >) return ItemType::identifier          ;
-                           if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
+                           //if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
                            if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return ItemType::functionCall        ;
                            if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return ItemType::functionalCast      ;
                            if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return ItemType::cast                ;

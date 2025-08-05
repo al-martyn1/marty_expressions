@@ -61,19 +61,31 @@ inline std::map<Error, std::string> makeErrorDescriptionMap()
 {
 std::map<Error, std::string> m =
 {
-{ Error::unknown                   , "!" },
-{ Error::invalid                   , "!" },
-{ Error::none                      , "no error - all is OK" },
-{ Error::no                        , "no error - all is OK" },
-{ Error::ok                        , "no error - all is OK" },
-{ Error::noError                   , "no error - all is OK" },
-{ Error::unknownParserState        , "parser is in an unknown state" },
-{ Error::notImplemented            , "feature not implemented" },
-{ Error::gotNonUnaryOrNonPrefixOp  , "got non-unary or non-prefix operator" },
-{ Error::gotNonUnaryOp             , "got non-unary operator" },
-{ Error::gotNonPrefixOp            , "got non-prefix operator" },
-{ Error::gotOperator               , "got operator" },
-{ Error::gotUnaryNonPostfixOp      , "got unary non-prefix operator" }
+{ Error::unknown                          , "!" },
+{ Error::invalid                          , "!" },
+{ Error::none                             , "no error - all is OK" },
+{ Error::no                               , "no error - all is OK" },
+{ Error::ok                               , "no error - all is OK" },
+{ Error::noError                          , "no error - all is OK" },
+{ Error::errorParserState                 , "parser already is in an eror state" },
+{ Error::unknownParserState               , "parser is in an unknown state" },
+{ Error::notImplemented                   , "feature not implemented" },
+{ Error::gotNonUnaryOrNonPrefixOp         , "got non-unary or non-prefix operator" },
+{ Error::gotNonUnaryOp                    , "got non-unary operator" },
+{ Error::gotNonPrefixOp                   , "got non-prefix operator" },
+{ Error::gotOperator                      , "got operator" },
+{ Error::gotUnaryNonPostfixOp             , "got unary non-prefix operator" },
+{ Error::gotUnexpectedVariable            , "got unexpected variable" },
+{ Error::gotUnexpectedConstant            , "got unexpected constant" },
+{ Error::gotUnexpectedOperator            , "got unexpected operator" },
+{ Error::gotUnexpectedOpeningParenthesis  , "got unexpected opening parenthesis" },
+{ Error::gotUnexpectedClosingParenthesis  , "got unexpected closing parenthesis" },
+{ Error::gotUnexpectedToken               , "got unexpected token" },
+{ Error::gotUnbalancedParenthesis         , "got open/close parenthesis balance mismatch" },
+{ Error::unexpectedEnd                    , "got unexpected end of expression" },
+{ Error::parenthesisBalanceBroken         , "the balance of the parenthesis is broken" },
+{ Error::missingClosing                   , "the balance of the parenthesis is broken" },
+{ Error::somethingGoesWrong               , "something goes wrong" }
 };
 return m;
 } // inline std::map<Error, std::string> makeErrorDescriptionMap()

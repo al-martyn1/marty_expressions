@@ -14,32 +14,80 @@ Error codes.
 0x00
 Пустое/отсутствующее значение.
 
-- unknownParserState
+- errorParserState
 0x01
+parser already is in an eror state.
+
+- unknownParserState
+0x02
 parser is in an unknown state.
 
 - notImplemented
-0x02
+0x03
 feature not implemented.
 
 - gotNonUnaryOrNonPrefixOp
-0x03
+0x04
 got non-unary or non-prefix operator.
 
 - gotNonUnaryOp
-0x04
+0x05
 got non-unary operator.
 
 - gotNonPrefixOp
-0x05
+0x06
 got non-prefix operator.
 
 - gotOperator
-0x06
+0x07
 got operator.
 
 - gotUnaryNonPostfixOp
-0x07
+0x08
 got unary non-prefix operator.
+
+- gotUnexpectedVariable
+0x09
+got unexpected variable.
+
+- gotUnexpectedConstant
+0x0A
+got unexpected constant.
+
+- gotUnexpectedOperator
+0x0B
+got unexpected operator.
+
+- gotUnexpectedOpeningParenthesis
+0x0C
+got unexpected opening parenthesis.
+
+- gotUnexpectedClosingParenthesis
+0x0D
+got unexpected closing parenthesis.
+
+- gotUnexpectedToken
+0x0E
+got unexpected token.
+
+- gotUnbalancedParenthesis
+0x0F
+got open/close parenthesis balance mismatch.
+
+- unexpectedEnd
+0x10
+got unexpected end of expression.
+
+- parenthesisBalanceBroken
+0x11
+the balance of the parenthesis is broken.
+
+- missingClosing
+0x12
+the balance of the parenthesis is broken.
+
+- somethingGoesWrong
+0x13
+something goes wrong.
 
 </val-list>

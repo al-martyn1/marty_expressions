@@ -59,19 +59,31 @@ MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( BracketKind, std::map, 1 )
 //#!Error
 enum class Error : std::uint32_t
 {
-    unknown                    = (std::uint32_t)(-1) /*!< ! */,
-    invalid                    = (std::uint32_t)(-1) /*!< ! */,
-    none                       = 0x00 /*!< no error - all is OK */,
-    no                         = 0x00 /*!< no error - all is OK */,
-    ok                         = 0x00 /*!< no error - all is OK */,
-    noError                    = 0x00 /*!< no error - all is OK */,
-    unknownParserState         = 0x01 /*!< parser is in an unknown state */,
-    notImplemented             = 0x02 /*!< feature not implemented */,
-    gotNonUnaryOrNonPrefixOp   = 0x03 /*!< got non-unary or non-prefix operator */,
-    gotNonUnaryOp              = 0x04 /*!< got non-unary operator */,
-    gotNonPrefixOp             = 0x05 /*!< got non-prefix operator */,
-    gotOperator                = 0x06 /*!< got operator */,
-    gotUnaryNonPostfixOp       = 0x07 /*!< got unary non-prefix operator */
+    unknown                           = (std::uint32_t)(-1) /*!< ! */,
+    invalid                           = (std::uint32_t)(-1) /*!< ! */,
+    none                              = 0x00 /*!< no error - all is OK */,
+    no                                = 0x00 /*!< no error - all is OK */,
+    ok                                = 0x00 /*!< no error - all is OK */,
+    noError                           = 0x00 /*!< no error - all is OK */,
+    errorParserState                  = 0x01 /*!< parser already is in an eror state */,
+    unknownParserState                = 0x02 /*!< parser is in an unknown state */,
+    notImplemented                    = 0x03 /*!< feature not implemented */,
+    gotNonUnaryOrNonPrefixOp          = 0x04 /*!< got non-unary or non-prefix operator */,
+    gotNonUnaryOp                     = 0x05 /*!< got non-unary operator */,
+    gotNonPrefixOp                    = 0x06 /*!< got non-prefix operator */,
+    gotOperator                       = 0x07 /*!< got operator */,
+    gotUnaryNonPostfixOp              = 0x08 /*!< got unary non-prefix operator */,
+    gotUnexpectedVariable             = 0x09 /*!< got unexpected variable */,
+    gotUnexpectedConstant             = 0x0A /*!< got unexpected constant */,
+    gotUnexpectedOperator             = 0x0B /*!< got unexpected operator */,
+    gotUnexpectedOpeningParenthesis   = 0x0C /*!< got unexpected opening parenthesis */,
+    gotUnexpectedClosingParenthesis   = 0x0D /*!< got unexpected closing parenthesis */,
+    gotUnexpectedToken                = 0x0E /*!< got unexpected token */,
+    gotUnbalancedParenthesis          = 0x0F /*!< got open/close parenthesis balance mismatch */,
+    unexpectedEnd                     = 0x10 /*!< got unexpected end of expression */,
+    parenthesisBalanceBroken          = 0x11 /*!< the balance of the parenthesis is broken */,
+    missingClosing                    = 0x12 /*!< the balance of the parenthesis is broken */,
+    somethingGoesWrong                = 0x13 /*!< something goes wrong */
 
 }; // enum 
 //#!
@@ -79,47 +91,95 @@ enum class Error : std::uint32_t
 MARTY_CPP_MAKE_ENUM_IS_FLAGS_FOR_NON_FLAGS_ENUM(Error)
 
 MARTY_CPP_ENUM_CLASS_SERIALIZE_BEGIN( Error, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknown                    , "Unknown"                  );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::none                       , "None"                     );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknownParserState         , "UnknownParserState"       );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::notImplemented             , "NotImplemented"           );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "GotNonUnaryOrNonPrefixOp" );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOp              , "GotNonUnaryOp"            );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonPrefixOp             , "GotNonPrefixOp"           );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotOperator                , "GotOperator"              );
-    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "GotUnaryNonPostfixOp"     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknown                           , "Unknown"                         );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::none                              , "None"                            );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unknownParserState                , "UnknownParserState"              );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedToken                , "GotUnexpectedToken"              );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::errorParserState                  , "ErrorParserState"                );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::notImplemented                    , "NotImplemented"                  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedOperator             , "GotUnexpectedOperator"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp          , "GotNonUnaryOrNonPrefixOp"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonUnaryOp                     , "GotNonUnaryOp"                   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotNonPrefixOp                    , "GotNonPrefixOp"                  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotOperator                       , "GotOperator"                     );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnaryNonPostfixOp              , "GotUnaryNonPostfixOp"            );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedVariable             , "GotUnexpectedVariable"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnbalancedParenthesis          , "GotUnbalancedParenthesis"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedConstant             , "GotUnexpectedConstant"           );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedOpeningParenthesis   , "GotUnexpectedOpeningParenthesis" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::gotUnexpectedClosingParenthesis   , "GotUnexpectedClosingParenthesis" );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::unexpectedEnd                     , "UnexpectedEnd"                   );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::parenthesisBalanceBroken          , "ParenthesisBalanceBroken"        );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::missingClosing                    , "MissingClosing"                  );
+    MARTY_CPP_ENUM_CLASS_SERIALIZE_ITEM( Error::somethingGoesWrong                , "SomethingGoesWrong"              );
 MARTY_CPP_ENUM_CLASS_SERIALIZE_END( Error, std::map, 1 )
 
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_BEGIN( Error, std::map, 1 )
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                    , "unknown"                        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                    , "invalid"                        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "none"                           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no"                             );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no_error"                       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "ok"                             );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "no-error"                       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                       , "noerror"                        );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknown-parser-state"           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknown_parser_state"           );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState         , "unknownparserstate"             );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "not-implemented"                );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "not_implemented"                );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented             , "notimplemented"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "got-non-unary-or-non-prefix-op" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "got_non_unary_or_non_prefix_op" );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp   , "gotnonunaryornonprefixop"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "got-non-unary-op"               );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "got_non_unary_op"               );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp              , "gotnonunaryop"                  );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "got-non-prefix-op"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "got_non_prefix_op"              );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp             , "gotnonprefixop"                 );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "got-operator"                   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "got_operator"                   );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                , "gotoperator"                    );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "got-unary-non-postfix-op"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "got_unary_non_postfix_op"       );
-    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp       , "gotunarynonpostfixop"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                           , "unknown"                            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknown                           , "invalid"                            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "none"                               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "no"                                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "no_error"                           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "ok"                                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "no-error"                           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::none                              , "noerror"                            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState                , "unknown-parser-state"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState                , "unknown_parser_state"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unknownParserState                , "unknownparserstate"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedToken                , "got-unexpected-token"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedToken                , "got_unexpected_token"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedToken                , "gotunexpectedtoken"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::errorParserState                  , "error-parser-state"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::errorParserState                  , "error_parser_state"                 );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::errorParserState                  , "errorparserstate"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented                    , "not-implemented"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented                    , "not_implemented"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::notImplemented                    , "notimplemented"                     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOperator             , "got-unexpected-operator"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOperator             , "got_unexpected_operator"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOperator             , "gotunexpectedoperator"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp          , "got-non-unary-or-non-prefix-op"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp          , "got_non_unary_or_non_prefix_op"     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOrNonPrefixOp          , "gotnonunaryornonprefixop"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp                     , "got-non-unary-op"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp                     , "got_non_unary_op"                   );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonUnaryOp                     , "gotnonunaryop"                      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp                    , "got-non-prefix-op"                  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp                    , "got_non_prefix_op"                  );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotNonPrefixOp                    , "gotnonprefixop"                     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                       , "got-operator"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                       , "got_operator"                       );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotOperator                       , "gotoperator"                        );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp              , "got-unary-non-postfix-op"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp              , "got_unary_non_postfix_op"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnaryNonPostfixOp              , "gotunarynonpostfixop"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedVariable             , "got-unexpected-variable"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedVariable             , "got_unexpected_variable"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedVariable             , "gotunexpectedvariable"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnbalancedParenthesis          , "got-unbalanced-parenthesis"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnbalancedParenthesis          , "got_unbalanced_parenthesis"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnbalancedParenthesis          , "gotunbalancedparenthesis"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedConstant             , "got-unexpected-constant"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedConstant             , "got_unexpected_constant"            );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedConstant             , "gotunexpectedconstant"              );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOpeningParenthesis   , "got-unexpected-opening-parenthesis" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOpeningParenthesis   , "got_unexpected_opening_parenthesis" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedOpeningParenthesis   , "gotunexpectedopeningparenthesis"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedClosingParenthesis   , "got-unexpected-closing-parenthesis" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedClosingParenthesis   , "got_unexpected_closing_parenthesis" );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::gotUnexpectedClosingParenthesis   , "gotunexpectedclosingparenthesis"    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unexpectedEnd                     , "unexpected-end"                     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unexpectedEnd                     , "unexpected_end"                     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::unexpectedEnd                     , "unexpectedend"                      );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::parenthesisBalanceBroken          , "parenthesis-balance-broken"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::parenthesisBalanceBroken          , "parenthesisbalancebroken"           );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::parenthesisBalanceBroken          , "parenthesis_balance_broken"         );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::missingClosing                    , "missing-closing"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::missingClosing                    , "missing_closing"                    );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::missingClosing                    , "missingclosing"                     );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::somethingGoesWrong                , "something-goes-wrong"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::somethingGoesWrong                , "something_goes_wrong"               );
+    MARTY_CPP_ENUM_CLASS_DESERIALIZE_ITEM( Error::somethingGoesWrong                , "somethinggoeswrong"                 );
 MARTY_CPP_ENUM_CLASS_DESERIALIZE_END( Error, std::map, 1 )
 
 

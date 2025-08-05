@@ -2,6 +2,7 @@
 
 unknown,invalid             = -1   // !
 none,no,ok,noError          =  0   // no error - all is OK
+errorParserState                   // parser already is in an eror state
 unknownParserState                 // parser is in an unknown state
 notImplemented                     // feature not implemented
 gotNonUnaryOrNonPrefixOp           // got non-unary or non-prefix operator
@@ -9,3 +10,18 @@ gotNonUnaryOp                      // got non-unary operator
 gotNonPrefixOp                     // got non-prefix operator
 gotOperator                        // got operator
 gotUnaryNonPostfixOp               // got unary non-prefix operator
+
+# For simple bool parser
+gotUnexpectedVariable              // got unexpected variable
+gotUnexpectedConstant              // got unexpected constant
+gotUnexpectedOperator              // got unexpected operator
+gotUnexpectedOpeningParenthesis    // got unexpected opening parenthesis
+gotUnexpectedClosingParenthesis    // got unexpected closing parenthesis
+gotUnexpectedToken                 // got unexpected token
+gotUnbalancedParenthesis           // got open/close parenthesis balance mismatch
+
+# Common
+unexpectedEnd                      // got unexpected end of expression
+parenthesisBalanceBroken           // the balance of the parenthesis is broken
+missingClosing           // the balance of the parenthesis is broken
+somethingGoesWrong                 // something goes wrong

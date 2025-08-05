@@ -52,17 +52,17 @@ struct ExpressionNode
                                              >;
 
 
-    ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатором - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
+    ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
+    std::vector<ExpressionNode>   argList;
 
     // Требуются для вычисления значения выражения, передаются в вычислитель
-    // В зависимости от формы - префиксная/постфиксная, а также арности операции могут
-    // производится по-разному.
+    // В зависимости от формы - префиксная/постфиксная, а также арности 
+    // операции могут производится по-разному.
     OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
     OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
 
     // associativity - right/left не требуется для вычисления выражения, она используется только для вычисления порядка операндов
 
-    std::vector<ExpressionNode>   argList;
 
 }; // struct ExpressionNode
 

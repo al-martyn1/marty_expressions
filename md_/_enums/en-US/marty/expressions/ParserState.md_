@@ -8,7 +8,7 @@ Parser states.
 
 - unknown,invalid
 (std::uint32_t)(-1)
-Invalid/unknown value.
+Unknown parser state.
 
 - waitUnaryPrefixOpOrValue,initial
 0x00

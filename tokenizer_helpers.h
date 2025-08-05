@@ -28,6 +28,42 @@ namespace tokenizer_helpers {
 
 
 //----------------------------------------------------------------------------
+template<typename CharType>
+constexpr
+CharType charToUpper(CharType ch)
+{
+    return ch>='a' && ch<='z' ? ch-'a'+'A' : ch;
+}
+
+template<typename StringType>
+constexpr
+StringType toUpperCase(const StringType &str)
+{
+    StringType res; res.reserve(str.size());
+    for(auto ch: str)
+        res.push_back(charToUpper(ch));
+    return res;
+}
+
+//----------------------------------------------------------------------------
+template<typename StringType>
+struct IdentifierConvertTraits
+{
+    StringType    falseStr = "false";
+    StringType    trueStr  = "true" ;
+    StringType    notStr   = "not"  ;
+    StringType    andStr   = "and"  ;
+    StringType    orStr    = "or"   ;
+
+    umba::tokenizer::payload_type   notOp = UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_NOT;
+    umba::tokenizer::payload_type   andOp = UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_AND;
+    umba::tokenizer::payload_type   orOp  = UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_OR ;
+};
+
+//----------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------
 template< typename TokenizerType, typename InputIteratorType, typename TokenParsedDataType, typename PositionInfoGeneratorType
 
         , typename PositionInfoType, typename OperatorTokenType
@@ -41,40 +77,74 @@ checkConvertIdentifier( ExpressionInputItem<PositionInfoType, OperatorTokenType,
                       , InputIteratorType b, InputIteratorType e
                       , const TokenParsedDataType &parsedData
                       , PositionInfoGeneratorType positionInfoGenerator
+                      , bool bCaseIgnore  = false
+                      , bool bBoolConvert = true
+                      , bool bOpConvert   = true
+                      , const IdentifierConvertTraits<StringType> &identConvertTraits = IdentifierConvertTraits<StringType>()
                       )
 {
-    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST
-        || tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST   && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST
+    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST    && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST
+        || tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST      && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST
+        || tokenType>=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_LAST
        ))
        return false;
 
     bool bRes = false;
 
+    auto caseConvert = [&](const StringType &s)
+    {
+        return bCaseIgnore ? toUpperCase<StringType>(s) : s;
+    };
+
     std::visit( [&](auto && val)
                 {
                     if constexpr (std::is_same_v< std::decay_t<decltype(val)>, typename TokenizerType::IdentifierDataHolder>)
                     {
-                        auto strVal       = val.pData->value;
-                        using StringType  = std::decay_t<decltype(strVal)>;
-                        
                         auto posInfo = positionInfoGenerator(b,e);
+                        StringType valToCmp = caseConvert(val.pData->value);
 
-                        // !!! Тут надо переделать
-                        if (strVal=="true" || strVal=="false" || strVal=="TRUE" || strVal=="FALSE" || strVal=="True" || strVal=="False")
+                        if (bBoolConvert)
                         {
-                            bool bTrue = strVal=="true" || strVal=="TRUE" || strVal=="True";
-                            resItem = marty::expressions::BoolLiteral<PositionInfoType>{posInfo, bTrue};
-                        }
-                        else
-                        {
-                            resItem = marty::expressions::IdentifierLiteral<PositionInfoType,StringType>{posInfo, strVal};
+                            if (valToCmp==caseConvert(identConvertTraits.falseStr))
+                            {
+                                resItem = marty::expressions::BoolLiteral<PositionInfoType>{posInfo, false};
+                                bRes = true;
+                            }
+                            else if (valToCmp==caseConvert(identConvertTraits.trueStr ))
+                            {
+                                resItem = marty::expressions::BoolLiteral<PositionInfoType>{posInfo, true};
+                                bRes = true;
+                            }
                         }
 
-                        bRes = true;
+                        if (bOpConvert && !bRes)
+                        {
+                            if (valToCmp==caseConvert(identConvertTraits.notStr))
+                            {
+                                resItem = marty::expressions::Operator<PositionInfoType,OperatorTokenType,StringType>{posInfo, identConvertTraits.notOp, val.pData->value};
+                                bRes = true;
+                            }
+                            else if (valToCmp==caseConvert(identConvertTraits.andStr))
+                            {
+                                resItem = marty::expressions::Operator<PositionInfoType,OperatorTokenType,StringType>{posInfo, identConvertTraits.andOp, val.pData->value};
+                                bRes = true;
+                            }
+                            else if (valToCmp==caseConvert(identConvertTraits.orStr))
+                            {
+                                resItem = marty::expressions::Operator<PositionInfoType,OperatorTokenType,StringType>{posInfo, identConvertTraits.orOp, val.pData->value};
+                                bRes = true;
+                            }
+                        }
+
+                        if (!bRes)
+                        {
+                            resItem = marty::expressions::IdentifierLiteral<PositionInfoType,StringType>{posInfo, val.pData->value};
+                            bRes = true;
+                        }
                     }
                 }
-                , parsedData
-                );
+              , parsedData
+              );
 
     return bRes;
 }
@@ -286,6 +356,11 @@ checkConvertOperatorToken( ExpressionInputItem<PositionInfoType, OperatorTokenTy
 
 
 //----------------------------------------------------------------------------
+
+                      // , bool bBoolConvert
+                      // , bool bCaseIgnore = false
+                      // , const StringType &falseStr = "false"
+                      // , const StringType &trueStr  = "true"
 template< typename TokenizerType, typename InputIteratorType, typename TokenParsedDataType, typename PositionInfoGeneratorType
 
         , typename PositionInfoType, typename OperatorTokenType
@@ -299,13 +374,17 @@ convertTokenizerEvent( std::vector<ExpressionInputItem<PositionInfoType, Operato
                      , InputIteratorType b, InputIteratorType e
                      , const TokenParsedDataType &parsedData
                      , PositionInfoGeneratorType positionInfoGenerator
+                     , bool bCaseIgnore  = false
+                     , bool bBoolConvert = true
+                     , bool bOpConvert   = true
+                     , const IdentifierConvertTraits<StringType> &identConvertTraits = IdentifierConvertTraits<StringType>()
                      )
 {
     // TokenizerType, InputIteratorType, TokenParsedDataType, PositionInfoGeneratorType, PositionInfoType, IntegerType, FloatingPointType, StringType
 
     ExpressionInputItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType> exprInputItem;
 
-    if (tokenizer_helpers::checkConvertIdentifier<TokenizerType, InputIteratorType, TokenParsedDataType, PositionInfoGeneratorType, PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType>(exprInputItem, tokenType, b, e, parsedData, positionInfoGenerator))
+    if (tokenizer_helpers::checkConvertIdentifier<TokenizerType, InputIteratorType, TokenParsedDataType, PositionInfoGeneratorType, PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType>(exprInputItem, tokenType, b, e, parsedData, positionInfoGenerator, bCaseIgnore, bBoolConvert, bOpConvert, identConvertTraits))
     {
         resVec.emplace_back(exprInputItem);
         return true;
@@ -498,6 +577,41 @@ mergeFullQualifiedIdents( const std::vector<ExpressionInputItem<PositionInfoType
 
     return resVec;
 }
+
+//----------------------------------------------------------------------------
+// Функция предназна прежде всего для унификации операторов после C++ токенизатора для обработки булевых выражений.
+// В булевых выражениях можно использовать символы как логических, так и битовых операторов.
+// Символ '~' часто используется при записи логических выражений для отрицаний, как и символ '!'.
+// Для унификации с ЯВУ, такими, как, например, C++, позволяем использовать '&&'/'||', так и '&'/'|'.
+template< typename PositionInfoType
+        , typename OperatorTokenType
+        , typename IntegerType       = MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
+        , typename FloatingPointType = MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
+        , typename StringType        = MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
+        >
+void replaceOperatorTokenInplace( std::vector<ExpressionInputItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType> > &vec
+                                , OperatorTokenType tokenCmp
+                                , OperatorTokenType replaceTo
+                                )
+{
+    for(auto &v: vec)
+    {
+        std::visit( [&](auto &a)
+                    {
+                        if constexpr (std::is_same_v <std::decay_t<decltype(a)>, Operator<PositionInfoType, OperatorTokenType, StringType> >)
+                        {
+                            if (a.value==tokenCmp)
+                                a.value = replaceTo;
+
+                        }
+                    }
+                  , v
+                  );
+    
+    }
+}
+
+//----------------------------------------------------------------------------
 
 
 
