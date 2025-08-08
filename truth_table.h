@@ -14,6 +14,7 @@ Fn  X X X X X X X X X X X X X X X X
 
 Для вывода таблицы истинности в горизонтальном виде надо:
 - для каждой переменной в цикле от 0 до stateMax() получить и вывести значение переменной
+Значение переменной извлекаем при помощи ф-ии varGetValue, которая извлекает бит переменной из вектора значений.
 
 */
 
@@ -25,6 +26,7 @@ Fn  X X X X X X X X X X X X X X X X
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -149,6 +151,13 @@ public:
         return StringType(fillSz, ' ');
     }
 
+    std::size_t varGetIndex(const StringType &varName) const
+    {
+        auto it = m_varIndices.find(varName);
+        if (it==m_varIndices.end())
+            return std::size_t(-1);
+        return it->second;
+    }
 
     bool varGetValue(std::size_t varIdx, VarsStateType varsState) const
     {
@@ -162,9 +171,23 @@ public:
         return it==m_varIndices.end() ? false : varGetValue(it->second, varsState);
     }
 
+    VarsStateType varSetValue(std::size_t varIdx, VarsStateType varsState, bool b) const
+    {
+        auto mask = varGetMask(varIdx);
+        return b ? (varsState | mask) : varsState;
+    }
+    
+    VarsStateType varSetValue(const StringType &varName, VarsStateType varsState, bool b) const
+    {
+        auto it = m_varIndices.find(varName);
+        if (it==m_varIndices.end())
+            throw std::runtime_error("marty::expressions::TruthTable::varSetValue: unknown variable");
+        return varSetValue(*it, varsState, b);
+    }
+
     std::size_t varAdd(const StringType &varName, bool *pNewVar=0)
     {
-        if (m_vars.size()>(63u-1u))
+        if (m_vars.size()>63u)
             throw std::runtime_error("marty::expressions::TruthTable::addVar: too many vars");
 
         auto it = m_varIndices.find(varName);
@@ -229,6 +252,107 @@ public:
     {
         return resultSet(varsState, res, PayloadType{0u});
     }
+
+    template<typename ErrorHandler>
+    TruthTable merge(const TruthTable &ttOther, ErrorHandler errHandler) const
+    {
+        auto names = std::set(m_vars.begin(), m_vars.end());
+        names.insert(ttOther.m_vars.begin(), ttOther.m_vars.end());
+
+        auto ttRes = TruthTable(names.begin(), names.end());
+
+
+        VarsStateType stMax = ttRes.varsStateMax();
+        VarsStateType st = 0u;
+
+        std::size_t varsNum = ttRes.varGetNumber();
+
+        // Перечисляем все состояния новой таблицы истинности
+        for(; st!=stMax; ++st)
+        {
+            // Нужно создать наборы переменных для каждой из двух таблиц истинности
+
+            VarsStateType stLeft  = 0u;
+            VarsStateType stRight = 0u;
+
+            // Перечисляем все переменные в новой таблице истинности
+            for(std::size_t iVar=0u; iVar!=varsNum; ++iVar)
+            {
+                // Нужно получить значение переменной в строчке новой таблици истинности.
+                // Индекс переменной у нас уже есть, поиска по имени не нужно
+                auto ttResVarValue = ttRes.varGetValue(iVar, st);
+
+                // Для исходных TT нужен поиск по имени
+
+                auto varName = ttRes.varGetName(iVar);
+
+                std::size_t varIdxLeft  = this  ->varGetIndex(varName);
+                std::size_t varIdxRight = ttOther.varGetIndex(varName);
+
+                if (varIdxLeft!=std::size_t(-1))
+                {
+                    stLeft  = this   ->varSetValue(varIdxLeft, stLeft, ttResVarValue);
+                }
+
+                if (varIdxRight!=std::size_t(-1))
+                {
+                    stRight  = ttOther.varSetValue(varIdxRight, stRight, ttResVarValue);
+                }
+            }
+
+            // Тут у нас есть 
+            // st - набор переменных результирующей ТТ
+            // stLeft, stRight - наборы пеерменных составляющих ТТ
+
+            int resLeft  = this  ->resultGet(stLeft);
+            int resRight = ttOther.resultGet(stRight);
+
+            if (resLeft>=0 && resRight>=0)
+            {
+                // if (resLeft!=resRight)
+                int result = errHandler(st, stLeft, stRight, resLeft, resRight, *this, ttOther);
+                if (result>=0)
+                {
+                    // Если хандлер разрешил, то устанавливаем то значение, которое он вернул
+                    ttRes.resultSet(st, result>0);
+                }
+            }
+
+            if (resLeft>=0)
+                ttRes.resultSet(st, resLeft>0);
+
+            if (resRight>=0)
+                ttRes.resultSet(st, resRight>0);
+        }
+
+        return ttRes;
+    }
+
+    TruthTable merge(const TruthTable &ttOther) const
+    {
+        auto errHandler = [](VarsStateType st, VarsStateType stLeft, VarsStateType stRight, int resLeft, int resRight, const TruthTable &ttLeft, const TruthTable &ttRight)
+        {
+            MARTY_ARG_USED(st      );
+            MARTY_ARG_USED(stLeft  );
+            MARTY_ARG_USED(stRight );
+            //MARTY_ARG_USED(resLeft );
+            //MARTY_ARG_USED(resRight);
+            MARTY_ARG_USED(ttLeft  );
+            MARTY_ARG_USED(ttRight );
+            //return stLeft;
+            //return stRight; // новые значения перезаписывают, в случае tt =| ttNew;
+            return resRight>=0 ? resRight : resLeft;
+        };
+
+        return merge(ttOther, errHandler);
+    }
+
+    TruthTable operator|   (const TruthTable &ttOther) const { return  merge(ttOther); }
+    TruthTable operator||  (const TruthTable &ttOther) const { return  merge(ttOther); }
+    TruthTable operator+   (const TruthTable &ttOther) const { return  merge(ttOther); }
+    TruthTable& operator|= (const TruthTable &ttOther)       { *this = merge(ttOther); return *this; }
+    // TruthTable& operator||=(const TruthTable &ttOther)       { *this = merge(ttOther); return *this; } // Нет такого оператора в плюсиках
+    TruthTable& operator+= (const TruthTable &ttOther)       { *this = merge(ttOther); return *this; }
 
 
 }; // struct TruthTable
