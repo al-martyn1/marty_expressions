@@ -20,6 +20,8 @@
 #include <stdexcept>
 #include <set>
 
+
+// marty::expressions::
 namespace marty {
 namespace expressions {
 
@@ -1555,4 +1557,5 @@ getEvaluator() const
 
 } // namespace expressions
 } // namespace marty
+// marty::expressions::
 
