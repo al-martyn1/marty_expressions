@@ -1046,7 +1046,6 @@ protected: // members
 
     const OperatorTraitsType  m_opTraits  ;
 
-
     Kind getOperatorKind(const OperatorType &op) const
     {
         return op.value==m_opTraits.openBracketOp
@@ -1078,6 +1077,278 @@ protected: // members
     
              : Kind::unknown;
     }
+    
+    Kind getExpressionItemKind(const ExpressionItemType &v) const
+    {
+        return std::visit( [&](const auto &a) -> Kind
+                           {
+                               using ArgType = std::decay_t<decltype(a)>;
+    
+                               if constexpr (std::is_same_v <ArgType, OperatorType >)
+                                   return getOperatorKind(a);
+    
+                               else if constexpr (std::is_same_v <ArgType, BoolLiteralType >)
+                                   return a.value ? Kind::tokenTrue : Kind::tokenFalse;
+    
+                               // Целочисленные типы допустимы в логических выражениях, при этом 0 - обозначает false, а не ноль (обычно 1) - обозначает true
+                               // Такие замены false/true на 0/1 часто используются в математической логике, дискретной математике, теории автоматов, и подобных дисциплинах.
+                               else if constexpr (std::is_same_v <ArgType, IntegerLiteralType >) 
+                                   return a.value ? Kind::tokenTrue : Kind::tokenFalse;
+    
+                               // if constexpr (std::is_same_v <ArgType, FloatingPointLiteral<PositionInfoType, FloatingPointType> >) return ItemType::floatingPointLiteral;
+                               // if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return ItemType::stringLiteral       ;
+                               // if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return ItemType::symbolLiteral       ;
+    
+                               else if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >)
+                                   return Kind::tokenIdent;
+    
+                               // if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
+                               // if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return ItemType::functionCall        ;
+                               // if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return ItemType::functionalCast      ;
+                               // if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return ItemType::cast                ;
+                               // if constexpr (std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>                   >) return ItemType::void_               ;
+    
+                               else 
+                                   return Kind::unknown;
+                           }
+                         , v
+                         );
+    }
+    
+    bool getBoolConstantItemValue(const ExpressionItemType &v) const
+    {
+        auto k = getExpressionItemKind(v);
+        return k==Kind::tokenTrue; // k==Kind::tokenFalse;
+        // return
+        // std::visit( [&](const auto &a) -> bool
+        //             {
+        //                 else if constexpr (std::is_same_v <std::decay_t<decltype(a)>, BoolLiteralType >)
+        //                     return a.value;
+        //                 else
+        //                     return false;
+        //             }
+        //           , v
+        //           );
+    }
+    
+    ExpressionItemType makeBoolExpressionItem(PositionInfoType p, bool v) const
+    {
+        return ExpressionItemType{BoolLiteralType{p, v}};
+    }
+    
+    // bool isBoolConstantItem(const ExpressionItemType &v) const
+    // bool getBoolConstantItemValue(const ExpressionItemType &v) const
+    // Kind getExpressionItemKind(const ExpressionItemType &v) const
+    
+    // Constant Absorption - поглощение констант
+    // Expression simplification - упрощение выражения
+    // Redundant condition elimination - удаление избыточных условий
+    // Logic minimization - минимизация логических функций
+    // Примеры:
+    // 'A&true' -> 'A', 'A&false' -> 'false', 'A|true' -> 'true', 'A|false' -> 'A'.
+    //
+    // Упрощением это назвать нельзя, хотя оно имеет место быть.
+    // Упрощение - под этим термином обычно подразумевают минимизацию, а этого мы тут не будем делать.
+    
+    void performConstantAbsorptionImpl(ExpressionNodeType &node) const
+    {
+        for(auto &a: node.argList)
+            performConstantAbsorptionImpl(a);
+    
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+    
+        bool foundFalse = false;
+        bool foundTrue  = false;
+    
+        switch(nodeValueKind)
+        {
+            case Kind::opOpen : [[fallthrough]];
+            case Kind::opClose:
+                if (node.argList.size()==1)
+                {
+                    auto childKind = getExpressionItemKind(node.argList[0].nodeValue);
+                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
+                    {
+                        node.nodeValue = node.argList[0].nodeValue;
+                        node.argList.clear();
+                    }
+                }
+                break;
+    
+            case Kind::opNot:
+                if (node.argList.size()==1)
+                {
+                    auto childKind = getExpressionItemKind(node.argList[0].nodeValue);
+                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
+                    {
+                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.argList[0].nodeValue), !getBoolConstantItemValue(node.argList[0].nodeValue));
+                        node.argList.clear();
+                    }
+                }
+                break;
+    
+            case Kind::opAnd: [[fallthrough]];
+            case Kind::opOr:
+                for(std::size_t i=0; i!=node.argList.size();  /* ++i */ )
+                {
+                    auto childKind = getExpressionItemKind(node.argList[i].nodeValue);
+                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
+                    {
+                        if (childKind==Kind::tokenFalse)
+                            foundFalse = true;
+    
+                        if (childKind==Kind::tokenTrue)
+                            foundTrue  = true;
+    
+                        node.argList.erase(node.argList.begin()+std::ptrdiff_t(i));
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+    
+                // Константы не обнаружены - ничего не трогаем
+                if (!foundFalse && !foundTrue)
+                    break;
+    
+                // В выражении AND найдена константа false - всё выражение ложно
+                if (nodeValueKind==Kind::opAnd && foundFalse)
+                {
+                    node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
+                    node.argList.clear();
+                    break;
+                }
+    
+                // В выражении OR найдена константа true - всё выражение истинно
+                if (nodeValueKind==Kind::opOr && foundTrue)
+                {
+                    node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
+                    node.argList.clear();
+                    break;
+                }
+    
+                // Что-то было найдено, но на результат выражения оно не повлияло
+    
+                if (node.argList.size()==1) // остался один элемент, просто перемещаем его на уровень выше, т.к. и OR и AND для одного элемента равны самому элементу
+                {
+                    node.nodeValue = node.argList[0].nodeValue;
+                    // node.argList.clear();
+                    auto tmp = node.argList[0].argList; // Тут какой-то косяк, появляется value_less_by_exception, исправляем через копию
+                    node.argList = tmp;
+                    break;
+                }
+    
+                // Больше одного элемента быть не должно никак (поставить какой-нибудь assert?)
+                // Но может быть 0 элементов в остатке - это значит, 
+                // что для OR все элементы false,
+                // или для AND все элементы true
+    
+                // А если таки у нас как-то получилось, что AND/OR не двухместные, а многоместные?
+                // Тогда, если у нас получилось 0 аргументов, то в результате должна быть константа true/false в зависимости от AND/OR
+                // А если получилось больше элементов, то просто их оставляем, так как удаление составляющих выражения
+                // на предыдущем шаге в целом не привело к однозначному результату
+    
+                if (node.argList.empty())
+                {
+                    if (nodeValueKind==Kind::opAnd)
+                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
+                    else
+                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
+                }
+    
+                break;
+            
+            case Kind::tokenIdent: [[fallthrough]];
+            case Kind::tokenFalse: [[fallthrough]];
+            case Kind::tokenTrue : [[fallthrough]];
+            case Kind::unknown   : [[fallthrough]];
+            default: {}
+        }
+    }
+
+    bool makeMultiAryImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (makeMultiAryImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+
+        if (nodeValueKind!=Kind::opAnd && nodeValueKind!=Kind::opOr)
+            return res;
+
+        bool foundSameOp = false;
+        for(const auto &childNode: node.argList)
+        {
+            auto childNodeValueKind = getExpressionItemKind(childNode.nodeValue);
+            if (childNodeValueKind==nodeValueKind)
+            {
+                foundSameOp = true;
+            }
+        }
+
+        if (!foundSameOp)
+            return res;
+
+        std::vector<ExpressionNodeType> newArgList;
+
+        for(const auto &childNode: node.argList)
+        {
+            auto childNodeValueKind = getExpressionItemKind(childNode.nodeValue);
+            if (childNodeValueKind==nodeValueKind)
+            {
+                newArgList.insert(newArgList.end(), childNode.argList.begin(), childNode.argList.end());
+            }
+            else
+            {
+                newArgList.push_back(childNode);
+            }
+        }
+
+        node.argList = newArgList;
+
+        return true;
+    }
+
+    // Продвинуть отрицания (Привести к нормальной форме отрицания)
+    // Promote Negations (Bring to Normal Form of Negation)
+    // bool makeMultiAryImpl(ExpressionNodeType &node) const
+
+    // Схлопывание вложенных скобок
+    // Collapsing nested parentheses
+
+    // Схлопывание двойных отрицаний
+    // Collapsing Double Negations
+
+
+
+// OperatorArity::nAry
+// struct ExpressionNode
+// {
+//     using ExpressionItemType = ExpressionItem< PositionInfoType 
+//                                              , OperatorTokenType
+//                                              , IntegerType      
+//                                              , FloatingPointType
+//                                              , StringType       
+//                                              >;
+//  
+//  
+//     ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
+//     std::vector<ExpressionNode>   argList;
+//  
+//     // Требуются для вычисления значения выражения, передаются в вычислитель
+//     // В зависимости от формы - префиксная/постфиксная, а также арности 
+//     // операции могут производится по-разному.
+//     OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
+//     OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
+
+
+
 
     PositionInfoType getPositionInfo(const ExpressionItemType &v) const
     {
@@ -1100,43 +1371,6 @@ protected: // members
 
                                else 
                                    return PositionInfoType{};
-                           }
-                         , v
-                         );
-    }
-
-    Kind getExpressionItemKind(const ExpressionItemType &v) const
-    {
-        return std::visit( [&](const auto &a) -> Kind
-                           {
-                               using ArgType = std::decay_t<decltype(a)>;
-
-                               if constexpr (std::is_same_v <ArgType, OperatorType >)
-                                   return getOperatorKind(a);
-
-                               else if constexpr (std::is_same_v <ArgType, BoolLiteralType >)
-                                   return a.value ? Kind::tokenTrue : Kind::tokenFalse;
-
-                               // Целочисленные типы допустимы в логических выражениях, при этом 0 - обозначает false, а не ноль (обычно 1) - обозначает true
-                               // Такие замены false/true на 0/1 часто используются в математической логике, дискретной математике, теории автоматов, и подобных дисциплинах.
-                               else if constexpr (std::is_same_v <ArgType, IntegerLiteralType >) 
-                                   return a.value ? Kind::tokenTrue : Kind::tokenFalse;
-
-                               // if constexpr (std::is_same_v <ArgType, FloatingPointLiteral<PositionInfoType, FloatingPointType> >) return ItemType::floatingPointLiteral;
-                               // if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return ItemType::stringLiteral       ;
-                               // if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return ItemType::symbolLiteral       ;
-
-                               else if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >)
-                                   return Kind::tokenIdent;
-
-                               // if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return ItemType::functionCall        ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return ItemType::functionalCast      ;
-                               // if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return ItemType::cast                ;
-                               // if constexpr (std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>                   >) return ItemType::void_               ;
-
-                               else 
-                                   return Kind::unknown;
                            }
                          , v
                          );
@@ -1167,157 +1401,7 @@ protected: // members
         return StringType(it, s.end());
     }
 
-    bool getBoolConstantItemValue(const ExpressionItemType &v) const
-    {
-        auto k = getExpressionItemKind(v);
-        return k==Kind::tokenTrue; // k==Kind::tokenFalse;
-        // return
-        // std::visit( [&](const auto &a) -> bool
-        //             {
-        //                 else if constexpr (std::is_same_v <std::decay_t<decltype(a)>, BoolLiteralType >)
-        //                     return a.value;
-        //                 else
-        //                     return false;
-        //             }
-        //           , v
-        //           );
-    }
 
-    ExpressionItemType makeBoolExpressionItem(PositionInfoType p, bool v) const
-    {
-        return ExpressionItemType{BoolLiteralType{p, v}};
-    }
-
-    // bool isBoolConstantItem(const ExpressionItemType &v) const
-    // bool getBoolConstantItemValue(const ExpressionItemType &v) const
-    // Kind getExpressionItemKind(const ExpressionItemType &v) const
-
-    // Constant Absorption - поглощение констант
-    // Expression simplification - упрощение выражения
-    // Redundant condition elimination - удаление избыточных условий
-    // Logic minimization - минимизация логических функций
-    // Примеры:
-    // 'A&true' -> 'A', 'A&false' -> 'false', 'A|true' -> 'true', 'A|false' -> 'A'.
-    //
-    // Упрощением это назвать нельзя, хотя оно имеет место быть.
-    // Упрощение - под этим термином обычно подразумевают минимизацию, а этого мы тут не будем делать.
-
-    void performConstantAbsorptionImpl(ExpressionNodeType &node) const
-    {
-        for(auto &a: node.argList)
-            performConstantAbsorptionImpl(a);
-
-        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
-
-        bool foundFalse = false;
-        bool foundTrue  = false;
-
-        switch(nodeValueKind)
-        {
-            case Kind::opOpen : [[fallthrough]];
-            case Kind::opClose:
-                if (node.argList.size()==1)
-                {
-                    auto childKind = getExpressionItemKind(node.argList[0].nodeValue);
-                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
-                    {
-                        node.nodeValue = node.argList[0].nodeValue;
-                        node.argList.clear();
-                    }
-                }
-                break;
-
-            case Kind::opNot:
-                if (node.argList.size()==1)
-                {
-                    auto childKind = getExpressionItemKind(node.argList[0].nodeValue);
-                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
-                    {
-                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.argList[0].nodeValue), !getBoolConstantItemValue(node.argList[0].nodeValue));
-                        node.argList.clear();
-                    }
-                }
-                break;
-
-            case Kind::opAnd: [[fallthrough]];
-            case Kind::opOr:
-                for(std::size_t i=0; i!=node.argList.size();  /* ++i */ )
-                {
-                    auto childKind = getExpressionItemKind(node.argList[i].nodeValue);
-                    if (childKind==Kind::tokenFalse || childKind==Kind::tokenTrue)
-                    {
-                        if (childKind==Kind::tokenFalse)
-                            foundFalse = true;
-
-                        if (childKind==Kind::tokenTrue)
-                            foundTrue  = true;
-
-                        node.argList.erase(node.argList.begin()+std::ptrdiff_t(i));
-                    }
-                    else
-                    {
-                        ++i;
-                    }
-                }
-
-                // Константы не обнаружены - ничего не трогаем
-                if (!foundFalse && !foundTrue)
-                    break;
-
-                // В выражении AND найдена константа false - всё выражение ложно
-                if (nodeValueKind==Kind::opAnd && foundFalse)
-                {
-                    node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
-                    node.argList.clear();
-                    break;
-                }
-
-                // В выражении OR найдена константа true - всё выражение истинно
-                if (nodeValueKind==Kind::opOr && foundTrue)
-                {
-                    node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
-                    node.argList.clear();
-                    break;
-                }
-
-                // Что-то было найдено, но на результат выражения оно не повлияло
-
-                if (node.argList.size()==1) // остался один элемент, просто перемещаем его на уровень выше, т.к. и OR и AND для одного элемента равны самому элементу
-                {
-                    node.nodeValue = node.argList[0].nodeValue;
-                    // node.argList.clear();
-                    auto tmp = node.argList[0].argList; // Тут какой-то косяк, появляется value_less_by_exception, исправляем через копию
-                    node.argList = tmp;
-                    break;
-                }
-
-                // Больше одного элемента быть не должно никак (поставить какой-нибудь assert?)
-                // Но может быть 0 элементов в остатке - это значит, 
-                // что для OR все элементы false,
-                // или для AND все элементы true
-
-                // А если таки у нас как-то получилось, что AND/OR не двухместные, а многоместные?
-                // Тогда, если у нас получилось 0 аргументов, то в результате должна быть константа true/false в зависимости от AND/OR
-                // А если получилось больше элементов, то просто их оставляем, так как удаление составляющих выражения
-                // на предыдущем шаге в целом не привело к однозначному результату
-
-                if (node.argList.empty())
-                {
-                    if (nodeValueKind==Kind::opAnd)
-                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
-                    else
-                        node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
-                }
-
-                break;
-            
-            case Kind::tokenIdent: [[fallthrough]];
-            case Kind::tokenFalse: [[fallthrough]];
-            case Kind::tokenTrue : [[fallthrough]];
-            case Kind::unknown   : [[fallthrough]];
-            default: {}
-        }
-    }
 
     template<typename ValueGetter>
     void getVariables(ExpressionNodeType &node, ValueGetter valueGetter) const
@@ -1361,6 +1445,13 @@ public: // members
     {
         auto res = node;
         performConstantAbsorptionImpl(res);
+        return res;
+    }
+
+    ExpressionNodeType makeMultiAry(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        makeMultiAryImpl(res);
         return res;
     }
 
@@ -1492,6 +1583,7 @@ public: // members
             case Kind::opOr:
 
                 // Будем поддерживать многоместные операции AND/OR, а не только двухместные
+                // И правильно сделал!!!
                 if (node.argList.empty())
                     return StringType();
                 else
