@@ -1379,6 +1379,48 @@ protected: // members
         return true;
     }
 
+    // Окружаем узел скобками
+    void addParenthesesImpl(ExpressionNodeType &node) const
+    {
+        auto exprNode = node;
+
+        auto &opNode = std::get<OperatorType>(node.nodeValue);
+        opNode.value = m_opTraits.openBracketOp;
+        opNode.text  = "(";
+
+        node.argList.clear();
+        node.argList.push_back(exprNode);
+    }
+
+    bool addRequiredParenthesesImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (addRequiredParenthesesImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+
+        if (nodeValueKind!=Kind::opAnd /* && nodeValueKind!=Kind::opNot */ )
+            return res;
+
+        // if (nodeValueKind==Kind::opOr)
+        //     return res;
+
+        for(auto &child: node.argList)
+        {
+            auto childKind = getExpressionItemKind(child.nodeValue);
+            if (childKind!=Kind::opOr)
+                continue;
+            addParenthesesImpl(child);
+            res = true;
+        }
+
+        return res;
+    }
 
 
     //TODO: Сделать раскрытие скобок
@@ -1484,13 +1526,13 @@ protected: // members
         switch(k)
         {
             case Kind::tokenIdent: label = std::string(utils::expressionItemToString(node.nodeValue).c_str()); break;
-            case Kind::opOpen    : label = "( )"  ; break; // label = "(...)"
-            case Kind::opClose   : label = "( )"  ; break; // label = "(...)"
-            case Kind::opNot     : label = "NOT"  ; break;
-            case Kind::opAnd     : label = "AND"  ; break;
-            case Kind::opOr      : label = "OR"   ; break;
-            case Kind::tokenFalse: label = "False"; break;
-            case Kind::tokenTrue : label = "True" ; break;
+            case Kind::opOpen    : label = "( )"    ; break; // label = "(...)"
+            case Kind::opClose   : label = "( )"    ; break; // label = "(...)"
+            case Kind::opNot     : label = "NOT"    ; break;
+            case Kind::opAnd     : label = "AND"    ; break;
+            case Kind::opOr      : label = "OR"     ; break;
+            case Kind::tokenFalse: label = "<False>"; break;
+            case Kind::tokenTrue : label = "<True>" ; break;
             case Kind::unknown: [[fallthrough]];
             default: label = "<UNKNOWN>";
         }
@@ -1578,6 +1620,13 @@ public: // simplifications
         return res;
     }
 
+    ExpressionNodeType addRequiredParentheses(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        addRequiredParenthesesImpl(res);
+        return res;
+    }
+
     // Simplification is not minimization
     ExpressionNodeType simplify(const ExpressionNodeType &node) const
     {
@@ -1608,6 +1657,8 @@ public: // simplifications
 
             done = !bContinue;
         }
+
+        addRequiredParenthesesImpl(res);
 
         return res;
     }
