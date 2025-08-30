@@ -1658,6 +1658,7 @@ public: // simplifications
             done = !bContinue;
         }
 
+        collapseNestedParenthesesImpl(res);
         addRequiredParenthesesImpl(res);
 
         return res;
