@@ -11,10 +11,6 @@
 //
 #include "utils.h"
 #include "truth_table.h"
-//
-#include "undef_min_max.h"
-//
-#include "truth_table.h"
 
 //
 #include <stdexcept>
@@ -23,6 +19,8 @@
 #include <unordered_map>
 #include <utility>
 
+//
+#include "undef_min_max.h"
 
 // marty::expressions::
 namespace marty {
@@ -146,16 +144,6 @@ public: // depended types
     using cast_type                   = CastType;
 
 
-
-// template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
-// struct VoidValue
-// {
-//     PositionInfoType     positionInfo;
-//     StringType           value; // for uniformity
-//  
-// }; // VoidValue
-
-
     using ExpressionInputItemType     = ExpressionInputItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType>;
     using expression_input_item_type  = ExpressionInputItemType;
 
@@ -174,11 +162,6 @@ public: // depended types
 
 public: // member types
 
-    // typedef Error (ExpressionParser::*ParserStateHandlerType)
-    //     ( const ExpressionItemType &tk
-    //     , ItemType itemType
-    //     , OperationInfoType opInfo // Только для itemType == ItemType::operator_, частично заполнено, нужно доустановить operatorPair, associativity, precedence
-    //     );
 
 
 protected: // members
@@ -228,20 +211,8 @@ protected: // helpers
              : op.value==m_opTraits.andOp
              ? Kind::opAnd
     
-             // : op.value==m_opTraits.xorOp
-             // ? Kind::opXor
-    
              : op.value==m_opTraits.orOp
              ? Kind::opOr
-    
-             // : op.value==m_opTraits.
-             // ? Kind::tokenIdent
-             //  
-             // : op.value==m_opTraits.
-             // ? Kind::tokenFalse
-             //  
-             // : op.value==m_opTraits.
-             // ? Kind::tokenTrue
     
              : Kind::unknown;
     }
@@ -263,18 +234,8 @@ protected: // helpers
                                else if constexpr (std::is_same_v <ArgType, IntegerLiteralType >) 
                                    return a.value ? Kind::tokenTrue : Kind::tokenFalse;
 
-                               // if constexpr (std::is_same_v <ArgType, FloatingPointLiteral<PositionInfoType, FloatingPointType> >) return ItemType::floatingPointLiteral;
-                               // if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return ItemType::stringLiteral       ;
-                               // if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return ItemType::symbolLiteral       ;
-
                                else if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >)
                                    return Kind::tokenIdent;
-
-                               // if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return ItemType::functionCall        ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return ItemType::functionalCast      ;
-                               // if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return ItemType::cast                ;
-                               // if constexpr (std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>                   >) return ItemType::void_               ;
 
                                else 
                                    return Kind::unknown;
@@ -490,59 +451,6 @@ protected: // helpers
     }
 
 
-    // bool isBoolConstantItem(const ExpressionItemType &v) const
-    // {
-    //     return
-    //     std::visit( [&](const auto &a) -> bool
-    //                 {
-    //                     else if constexpr (std::is_same_v <std::decay_t<decltype(a)>, BoolLiteralType >)
-    //                         return true;
-    //                     else
-    //                         return false;
-    //                 }
-    //               , v
-    //               );
-    // }
-
-    // bool getBoolConstantItemValue(const ExpressionItemType &v) const
-    // {
-    //     auto k = getExpressionItemKind(v);
-    //     return k==Kind::tokenFalse || k==Kind::tokenTrue;
-    //     // return
-    //     // std::visit( [&](const auto &a) -> bool
-    //     //             {
-    //     //                 else if constexpr (std::is_same_v <std::decay_t<decltype(a)>, BoolLiteralType >)
-    //     //                     return a.value;
-    //     //                 else
-    //     //                     return false;
-    //     //             }
-    //     //           , v
-    //     //           );
-    // }
-    //  
-    // ExpressionItemType makeBoolExpressionItem(bool v) const
-    // {
-    //     return ExpressionItemType{marty::expressions::BoolLiteral<PositionInfoType>{posInfo, v}};
-    // }
-
-
-
-
-
-/*
-    using PositionInfoType            = PositionInfoTypeT;
-    using BoolLiteralType             = BoolLiteral<PositionInfoType>;
-
-*/    
-
-    // ExpressionNodeType
-
-    // bool precedenceLess(unsigned p1, unsigned p2) const     { return precedenceCompare(p1, p2)<0; }
-    // bool precedenceGreater(unsigned p1, unsigned p2) const  { return precedenceCompare(p1, p2)>0; }
-    // bool precedenceLessThanTop(unsigned p) const            { return precedenceCompare(getKindPrecedence(getTopOperatorKind()), p)<0; }
-    // bool precedenceGreaterThanTop(unsigned p) const         { return precedenceCompare(getKindPrecedence(getTopOperatorKind()), p)>0; }
-
-
 public: // ctors
 
     SimpleBoolExpressionParser(const OperatorTraitsType &opTraits) : m_opTraits(opTraits)
@@ -565,21 +473,6 @@ public: // methods
     //const ExpressionNodeType& getExpression() const
     ExpressionNodeType getExpression() const
     {
-    //  
-    // ExpressionNodeType  m_expression;
-    //  
-    // // ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
-    // // std::vector<ExpressionNode>   argList;
-    // //  
-    // // // Требуются для вычисления значения выражения, передаются в вычислитель
-    // // // В зависимости от формы - префиксная/постфиксная, а также арности 
-    // // // операции могут производится по-разному.
-    // // OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
-    // // OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
-
-        // ExpressionInputItem resItem = marty::expressions::BoolLiteral<PositionInfoType>{posInfo, tokenType==UMBA_TOKENIZER_TOKEN_BOOL_LITERAL_TRUE};
-        // 
-
         return m_expression;
     }
 
@@ -607,19 +500,6 @@ public: // methods
     getEvaluator() const;
     
     
-
-protected: // parsing helpers
-
-    // ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
-    // std::vector<ExpressionNode>   argList;
-    //  
-    // // Требуются для вычисления значения выражения, передаются в вычислитель
-    // // В зависимости от формы - префиксная/постфиксная, а также арности 
-    // // операции могут производится по-разному.
-    // OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
-    // OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
-
-
 public: // parsing methods
 
     Error initialize()
@@ -829,46 +709,7 @@ public: // parsing methods
                 
         }
 
-    return m_error;
-
-    // enum class State
-    // {
-    //     readVar,
-    //     waitOperator,
-    //     err
-    // };
-    //  
-    // enum class Kind
-    // {
-    //     unknown,
-    //     opOpen,
-    //     opClose,
-    //     opNot,
-    //     opAnd,
-    //     // opXor,
-    //     opOr,
-    //     tokenIdent,
-    //     tokenFalse,
-    //     tokenTrue
-    // };
-
-    // State      m_state        = State::readVar;
-    // int        m_nestingLevel = 0;
-    // Error      m_error        = Error::noError; // gotUnexpectedClosingBacket
-    //  
-    // std::vector<OperatorType>    m_opStack ;
-    // std::vector<ExpressionItem>  m_varStack;
-
-
-// gotUnexpectedVariable              // got unexpected variable
-// gotUnexpectedOperator              // got unexpected operator
-// gotUnexpectedOpeningBacket         // got unexpected opening backet
-// gotUnexpectedClosingBacket         // got unexpected closing backet
-// errorParserState                   // parser already is in an eror state
-// unknownParserState                 // parser is in an unknown state
-
-
-        // return Error::noError;
+        return m_error;
     }
 
 
@@ -979,21 +820,9 @@ protected: // members
              : op.value==m_opTraits.andOp
              ? Kind::opAnd
     
-             // : op.value==m_opTraits.xorOp
-             // ? Kind::opXor
-    
              : op.value==m_opTraits.orOp
              ? Kind::opOr
-    
-             // : op.value==m_opTraits.
-             // ? Kind::tokenIdent
-             //  
-             // : op.value==m_opTraits.
-             // ? Kind::tokenFalse
-             //  
-             // : op.value==m_opTraits.
-             // ? Kind::tokenTrue
-    
+
              : Kind::unknown;
     }
     
@@ -1014,18 +843,8 @@ protected: // members
                                else if constexpr (std::is_same_v <ArgType, IntegerLiteralType >) 
                                    return a.value ? Kind::tokenTrue : Kind::tokenFalse;
     
-                               // if constexpr (std::is_same_v <ArgType, FloatingPointLiteral<PositionInfoType, FloatingPointType> >) return ItemType::floatingPointLiteral;
-                               // if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return ItemType::stringLiteral       ;
-                               // if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return ItemType::symbolLiteral       ;
-    
                                else if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >)
                                    return Kind::tokenIdent;
-    
-                               // if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return ItemType::functionCall        ;
-                               // if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return ItemType::functionalCast      ;
-                               // if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return ItemType::cast                ;
-                               // if constexpr (std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>                   >) return ItemType::void_               ;
     
                                else 
                                    return Kind::unknown;
@@ -1038,26 +857,12 @@ protected: // members
     {
         auto k = getExpressionItemKind(v);
         return k==Kind::tokenTrue; // k==Kind::tokenFalse;
-        // return
-        // std::visit( [&](const auto &a) -> bool
-        //             {
-        //                 else if constexpr (std::is_same_v <std::decay_t<decltype(a)>, BoolLiteralType >)
-        //                     return a.value;
-        //                 else
-        //                     return false;
-        //             }
-        //           , v
-        //           );
     }
     
     ExpressionItemType makeBoolExpressionItem(PositionInfoType p, bool v) const
     {
         return ExpressionItemType{BoolLiteralType{p, v}};
     }
-    
-    // bool isBoolConstantItem(const ExpressionItemType &v) const
-    // bool getBoolConstantItemValue(const ExpressionItemType &v) const
-    // Kind getExpressionItemKind(const ExpressionItemType &v) const
     
     // Constant Absorption - поглощение констант
     // Expression simplification - упрощение выражения
@@ -1463,10 +1268,10 @@ protected: // members
     }
 
 
-    //TODO: Нужно избавится от одинаковых переменных (удаление дубликатов)
-    //TODO: Нужно избавится от прямого и инверсного вхождения переменных:
-    //      для OR всё выражение будет равно единице;
-    //      для AND всё выражение будет равно нулю;
+    // Нужно избавится от одинаковых переменных (удаление дубликатов)
+    // Нужно избавится от прямого и инверсного вхождения переменных:
+    //   для OR всё выражение будет равно единице;
+    //   для AND всё выражение будет равно нулю;
 
     bool collapseSameVarsAndObvioslyConstantsImpl(ExpressionNodeType &node) const
     {
@@ -1577,61 +1382,6 @@ protected: // members
 
 
     //TODO: Сделать раскрытие скобок
-
-
-    // bool collapseNestedParenthesesImpl(ExpressionNodeType &node) const
-    // {
-    //     bool res = false;
-    //  
-    //     for(auto &childNode: node.argList)
-    //     {
-    //         if (collapseNestedParenthesesImpl(childNode))
-    //             res = true;
-    //     }
-    //  
-    //     auto nodeValueKind = getExpressionItemKind(node.nodeValue);
-    //     if (nodeValueKind!=Kind::opOpen && nodeValueKind!=Kind::opClose)
-    //         return res;
-    //  
-    //     if (node.argList.size()!=1)
-    //         return res;
-    //  
-    //     auto childValueKind = getExpressionItemKind(node.argList[0].nodeValue);
-    //     if (childValueKind!=Kind::opOpen && childValueKind!=Kind::opClose)
-    //         return res;
-    //  
-    //     auto tmpArgList = node.argList[0].argList;
-    //  
-    //     node.argList = tmpArgList;
-    //  
-    //     return true;
-    // }
-
-
-
-
-// OperatorArity::nAry
-// struct ExpressionNode
-// {
-//     using ExpressionItemType = ExpressionItem< PositionInfoType 
-//                                              , OperatorTokenType
-//                                              , IntegerType      
-//                                              , FloatingPointType
-//                                              , StringType       
-//                                              >;
-//  
-//  
-//     ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
-//     std::vector<ExpressionNode>   argList;
-//  
-//     // Требуются для вычисления значения выражения, передаются в вычислитель
-//     // В зависимости от формы - префиксная/постфиксная, а также арности 
-//     // операции могут производится по-разному.
-//     OperatorAffixation            affixation    = OperatorAffixation::none;    //  none/prefix/postfix
-//     OperatorArity                 arity         = OperatorArity::none;         // unary/binary/etc
-
-
-
 
     PositionInfoType getPositionInfo(const ExpressionItemType &v) const
     {
@@ -1960,8 +1710,6 @@ public: // members
         return tt;
     }
 
-    
-
 
     StringType toString( const ExpressionNodeType &node
                        , bool useNamedOps=false // Также вместо 0/1 выводит false/true
@@ -2056,8 +1804,6 @@ public: // members
 
         oss << "}\n";
     }
-
-
 
 
 }; // struct SimpleBoolExpressionEvaluator
