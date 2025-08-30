@@ -285,6 +285,51 @@ ItemType getExpressionItemType(const ExpressionInputItem<PositionInfoType, Opera
 }
 
 //----------------------------------------------------------------------------
+template< typename PositionInfoType
+        , typename OperatorTokenType
+        , typename IntegerType       = MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
+        , typename FloatingPointType = MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
+        , typename StringType        = MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
+        >
+PositionInfoType getExpressionItemPositionInfo(const ExpressionItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType> &v)
+{
+    return std::visit( [](const auto &a) -> PositionInfoType
+                       {
+                           return a.positionInfo;
+                       }
+                     , v
+                     );
+}
+
+//----------------------------------------------------------------------------
+template< typename PositionInfoType
+        , typename OperatorTokenType
+        , typename IntegerType       = MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE
+        , typename FloatingPointType = MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE
+        , typename StringType        = MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE
+        >
+StringType getExpressionItemString(const ExpressionItem<PositionInfoType, OperatorTokenType, IntegerType, FloatingPointType, StringType> &v)
+{
+    return std::visit( [](const auto &a) -> StringType
+                       {
+                           using ArgType = std::decay_t<decltype(a)>;
+                           if constexpr ( std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>     >
+                                       || std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>     >
+                                       || std::is_same_v <ArgType, IdentifierLiteral<PositionInfoType, StringType> >
+                                       || std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>      >
+                                       || std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>    >
+                                       || std::is_same_v <ArgType, Cast<PositionInfoType, StringType>              >
+                                       || std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>         >
+                                        )
+                               return a.value;
+                           else
+                               return StringType();
+                       }
+                     , v
+                     );
+}
+
+//----------------------------------------------------------------------------
 inline
 std::string getExpressionItemTypeName(ItemType ii)
 {

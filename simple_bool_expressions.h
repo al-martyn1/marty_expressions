@@ -19,6 +19,9 @@
 //
 #include <stdexcept>
 #include <set>
+#include <unordered_set>
+#include <unordered_map>
+#include <utility>
 
 
 // marty::expressions::
@@ -52,12 +55,12 @@ enum class SimpleBoolExpressionItemKind
 template<typename OperatorTokenTypeT>
 struct SimpleBoolExpressionOperatorTraits
 {
-    OperatorTokenTypeT   openBracketOp;
-    OperatorTokenTypeT   closeBracketOp;
-    OperatorTokenTypeT   notOp;
-    OperatorTokenTypeT   andOp;
-    // OperatorTokenTypeT   xorOp;
-    OperatorTokenTypeT   orOp ;
+    OperatorTokenTypeT   openBracketOp ; // UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN    0x0031u
+    OperatorTokenTypeT   closeBracketOp; // UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE   0x0032u
+    OperatorTokenTypeT   notOp         ; // UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_NOT  0x2150u  /  UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_NOT  0x2160u
+    OperatorTokenTypeT   andOp         ; // UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_AND  0x2151u  /  UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_AND  0x2161u
+    // OperatorTokenTypeT   xorOp         ;
+    OperatorTokenTypeT   orOp          ; // UMBA_TOKENIZER_TOKEN_OPERATOR_LOGICAL_OR   0x2152u  /  UMBA_TOKENIZER_TOKEN_OPERATOR_BITWISE_OR   0x2162u
 };
 
 //----------------------------------------------------------------------------
@@ -525,67 +528,6 @@ protected: // helpers
 
 
 
-    std::size_t countGraphNodes(const ExpressionNodeType &n) const
-    {
-        //std::vector<ExpressionNode>   argList;
-        std::size_t res = 1;
-
-        for(const auto &a: n.argList)
-            res += countGraphNodes(a);
-
-        return res;
-    }
-
-    template<typename StreamType>
-    void gvGraph(StreamType &oss, const ExpressionNodeType &node, std::size_t n) const
-    {
-        oss << "n" << n << ";\n";
-
-        Kind k = getExpressionItemKind(node.nodeValue);
-
-        std::string label;
-        switch(k)
-        {
-            case Kind::tokenIdent: label = std::string(utils::expressionItemToString(node.nodeValue).c_str()); break;
-            // case Kind::opOpen    : label = "(...)"   ; break;
-            // case Kind::opClose   : label = "(...)"   ; break;
-            case Kind::opOpen    : label = "( )"  ; break;
-            case Kind::opClose   : label = "( )"  ; break;
-            case Kind::opNot     : label = "NOT"  ; break;
-            case Kind::opAnd     : label = "AND"  ; break;
-            case Kind::opOr      : label = "OR"   ; break;
-            case Kind::tokenFalse: label = "False"; break;
-            case Kind::tokenTrue : label = "True" ; break;
-            case Kind::unknown: [[fallthrough]];
-            default: label = "<UNKNOWN>";
-        }
-
-
-    // ExpressionItemType            nodeValue; // литерал - аргументов нет (они игнорируются), идентификатор - ссылка на переменную, FunctionCall - много аргументов, FunctionalCast - один аргумент, или Operator - количество аргументов зависит от оператора
-    // std::vector<ExpressionNode>   argList;
-
-
-        // Kind getOperatorKind(const OperatorType &op) const
-        
-        // n003 [label="*"] ;
-        oss << "n" << n << " [label=\"" << label << "\"];\n";
-
-        std::size_t 
-        nextBase = n+1;
-        for(const auto &a: node.argList)
-        {
-            oss << "n" << n << " -- " << "n" << nextBase << ";\n";
-            nextBase += countGraphNodes(a);
-        }
-
-        nextBase = n+1;
-        for(const auto &a: node.argList)
-        {
-            gvGraph(oss, a, nextBase);
-            nextBase += countGraphNodes(a);
-        }
-
-    }
 
 /*
     using PositionInfoType            = PositionInfoTypeT;
@@ -639,29 +581,6 @@ public: // methods
         // 
 
         return m_expression;
-    }
-
-    template<typename StreamType>
-    void dump(StreamType &oss) const
-    {
-        MARTY_ARG_USED(oss);
-    }
-
-    template<typename StreamType>
-    void gvGraph(StreamType &oss, const ExpressionNodeType &n, const std::string &label="") const
-    {
-        oss << "graph \"\"\n";
-        oss << "{\n";
-        if (!label.empty())
-        {
-            oss << "label=\"" << label << "\"\n";
-            oss << "labelloc=\"t\";\n";
-        }
-        //oss << "{\n";
-
-        gvGraph(oss, n, 0);
-
-        oss << "}\n";
     }
 
     std::string getErrorMessage(Error err, bool addErrCode=true) const
@@ -1150,11 +1069,15 @@ protected: // members
     // Упрощением это назвать нельзя, хотя оно имеет место быть.
     // Упрощение - под этим термином обычно подразумевают минимизацию, а этого мы тут не будем делать.
     
-    void performConstantAbsorptionImpl(ExpressionNodeType &node) const
+    bool performConstantAbsorptionImpl(ExpressionNodeType &node) const
     {
+        bool bRes = false;
         for(auto &a: node.argList)
-            performConstantAbsorptionImpl(a);
-    
+        {
+            if (performConstantAbsorptionImpl(a))
+                bRes = true;
+        }
+
         auto nodeValueKind = getExpressionItemKind(node.nodeValue);
     
         bool foundFalse = false;
@@ -1171,6 +1094,7 @@ protected: // members
                     {
                         node.nodeValue = node.argList[0].nodeValue;
                         node.argList.clear();
+                        bRes = true;
                     }
                 }
                 break;
@@ -1183,6 +1107,7 @@ protected: // members
                     {
                         node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.argList[0].nodeValue), !getBoolConstantItemValue(node.argList[0].nodeValue));
                         node.argList.clear();
+                        bRes = true;
                     }
                 }
                 break;
@@ -1217,6 +1142,7 @@ protected: // members
                 {
                     node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
                     node.argList.clear();
+                    bRes = true;
                     break;
                 }
     
@@ -1225,6 +1151,7 @@ protected: // members
                 {
                     node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
                     node.argList.clear();
+                    bRes = true;
                     break;
                 }
     
@@ -1255,6 +1182,7 @@ protected: // members
                         node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), true);
                     else
                         node.nodeValue = makeBoolExpressionItem(getPositionInfo(node.nodeValue), false);
+                    bRes = true;
                 }
     
                 break;
@@ -1265,6 +1193,8 @@ protected: // members
             case Kind::unknown   : [[fallthrough]];
             default: {}
         }
+
+        return bRes;
     }
 
     bool makeMultiAryImpl(ExpressionNodeType &node) const
@@ -1315,15 +1245,368 @@ protected: // members
         return true;
     }
 
-    // Продвинуть отрицания (Привести к нормальной форме отрицания)
-    // Promote Negations (Bring to Normal Form of Negation)
-    // bool makeMultiAryImpl(ExpressionNodeType &node) const
-
     // Схлопывание вложенных скобок
     // Collapsing nested parentheses
+    bool collapseNestedParenthesesImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (collapseNestedParenthesesImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind!=Kind::opOpen && nodeValueKind!=Kind::opClose)
+            return res;
+
+        if (node.argList.size()!=1)
+            return res;
+
+        auto childValueKind = getExpressionItemKind(node.argList[0].nodeValue);
+        if (childValueKind!=Kind::opOpen && childValueKind!=Kind::opClose)
+            return res;
+
+        auto tmpArgList = node.argList[0].argList;
+
+        node.argList = tmpArgList;
+
+        return true;
+    }
+
+    // Продвинуть отрицания (Привести к нормальной форме отрицания)
+    // Promote Negations (Bring to Normal Form of Negation)
+    bool promoteNegationsImpl2(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (promoteNegationsImpl(childNode))
+                res = true;
+        }
+
+        auto invertNodeOperator = [&](ExpressionNodeType &n, Kind nk)
+        {
+            auto &opNode = std::get<OperatorType>(n.nodeValue);
+            opNode.value = nk==Kind::opAnd ? m_opTraits.orOp : m_opTraits.andOp;
+            opNode.text  = nk==Kind::opAnd ?       "|"       :       "&"       ;
+        };
+
+        auto promoteImpl = [&]( ExpressionNodeType notNodeTpl, std::vector<ExpressionNodeType> &argList )
+        {
+            notNodeTpl.argList.clear();
+            std::vector<ExpressionNodeType> newArgList;
+            for(auto &ch : argList)
+            {                                      
+                auto notNode = notNodeTpl;         
+                notNode.argList.push_back(ch);     
+                newArgList.push_back(notNode);     
+            }                                      
+
+            argList = newArgList;
+        };
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind!=Kind::opNot)
+            return res;
+
+        if (node.argList.size()!=1)
+            return res;
+
+        auto &parenthesesNode = node.argList[0];
+        auto parenthesesNodeValueKind = getExpressionItemKind(parenthesesNode.nodeValue);
+        if (parenthesesNodeValueKind==Kind::opAnd || parenthesesNodeValueKind==Kind::opOr || parenthesesNodeValueKind==Kind::opNot)
+        {
+            // Мы ожидали ноду со скобками, а получили ноду с лог оператором
+
+            if (parenthesesNodeValueKind==Kind::opNot)
+            {
+                if (parenthesesNode.argList.size()!=1)
+                    return res;
+                node = ExpressionNodeType(parenthesesNode.argList[0]);
+                return true;
+            }
+
+            // Тут у нас либо AND, либо OR
+
+            invertNodeOperator(parenthesesNode, parenthesesNodeValueKind);
+
+            promoteImpl(node, parenthesesNode.argList);
+            node = ExpressionNodeType(parenthesesNode);
+            return true;
+        }
+
+        if (parenthesesNodeValueKind!=Kind::opOpen && parenthesesNodeValueKind!=Kind::opClose)
+            return res;
+
+        if (parenthesesNode.argList.size()!=1)
+            return res;
+
+        auto &parenthesesChildNode = parenthesesNode.argList[0];
+        auto parenthesesChildNodeValueKind = getExpressionItemKind(parenthesesChildNode.nodeValue);
+        if (parenthesesChildNodeValueKind!=Kind::opAnd && parenthesesChildNodeValueKind!=Kind::opOr && parenthesesChildNodeValueKind!=Kind::opNot)
+            return res;
+
+        if (parenthesesChildNodeValueKind==Kind::opNot)
+        {
+            if (parenthesesChildNode.argList.size()!=0)
+                return res;
+            parenthesesChildNode = ExpressionNodeType(parenthesesChildNode.argList[0]);
+            node = parenthesesNode;
+            return true;
+        }
+
+        invertNodeOperator(parenthesesChildNode, parenthesesChildNodeValueKind);
+        promoteImpl(node, parenthesesChildNode.argList);
+
+        node = ExpressionNodeType(parenthesesNode);
+
+        return true;
+    }
+
+    bool promoteNegationsImpl(ExpressionNodeType &node) const
+    {
+        std::size_t cnt = 0;
+        while(promoteNegationsImpl2(node))
+            ++cnt;
+        return cnt!=0;
+    }
 
     // Схлопывание двойных отрицаний
     // Collapsing Double Negations
+    // Реализовано в promoteNegations
+
+    bool removeUnnecessaryParenthesesImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (removeUnnecessaryParenthesesImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind!=Kind::opAnd && nodeValueKind!=Kind::opOr)
+            return res;
+
+        // if (node.argList.size()!=1)
+        //     return res;
+
+        for(auto &childNode: node.argList)
+        {
+            auto childNodeValueKind = getExpressionItemKind(childNode.nodeValue);
+            if (childNodeValueKind!=Kind::opOpen && childNodeValueKind==Kind::opClose)
+                continue;
+
+            if (childNode.argList.size()!=1)
+                continue;
+
+            auto &childChildNode = childNode.argList[0];
+            auto childChildNodeValueKind = getExpressionItemKind(childChildNode.nodeValue);
+            if (childChildNodeValueKind!=Kind::opAnd && childChildNodeValueKind!=Kind::opOr)
+                continue;
+
+            if (nodeValueKind!=childChildNodeValueKind)
+                continue;
+
+            childNode = ExpressionNodeType(childChildNode);
+
+            res = true;
+        }
+    
+        return res;
+    }
+
+    //! Возвращает 0, если не идентификатор, 1 - если идентификатор, и -1, если идентификатор с отрицанием
+    int isIdentNode(const ExpressionNodeType &node) const
+    {
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind==Kind::tokenIdent) 
+            return 1; // Для идентификатора возвращаем прямое вхождение
+
+        if (nodeValueKind!=Kind::opNot)
+            return 0; // Если не отрицание, то это явно не идентификатор с отрицанием
+        
+        if (node.argList.size()!=1)
+            return 0; // Отрицание, но некорректное число потомков
+
+        auto &child = node.argList[0];
+        auto childValueKind = getExpressionItemKind(child.nodeValue);
+        if (childValueKind==Kind::tokenIdent)
+            return -1; // Дочерный элемент у отрицания - идентификатор, возвращаем инверсное вхождение
+
+        return 0;
+    }
+
+    //! Возвращает идентификатор, если у нас node tokenIdent или opNot с дочерним tokenIdent
+    StringType getIdentNodeString(const ExpressionNodeType &node) const
+    {
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind==Kind::tokenIdent) 
+            return getExpressionItemString(node.nodeValue);
+
+        if (nodeValueKind!=Kind::opNot)
+            return StringType();
+        
+        if (node.argList.size()!=1)
+            return StringType();
+
+        auto &child = node.argList[0];
+        auto childValueKind = getExpressionItemKind(child.nodeValue);
+        if (childValueKind==Kind::tokenIdent)
+            return getExpressionItemString(child.nodeValue);
+
+        return StringType();
+    }
+
+
+    //TODO: Нужно избавится от одинаковых переменных (удаление дубликатов)
+    //TODO: Нужно избавится от прямого и инверсного вхождения переменных:
+    //      для OR всё выражение будет равно единице;
+    //      для AND всё выражение будет равно нулю;
+
+    bool collapseSameVarsAndObvioslyConstantsImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (collapseSameVarsAndObvioslyConstantsImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+
+        if (nodeValueKind!=Kind::opAnd && nodeValueKind!=Kind::opOr)
+            return res;
+
+        using OccurrenceCounters = std::pair<std::size_t, std::size_t>; // first - прямые вхождения, second - инверсные
+
+        std::unordered_map<StringType, OccurrenceCounters> occurrenceCounters;
+
+        bool hasTheSameVar = false;
+
+        auto replaceNodeWithBoolConstant = [&]()
+        {
+            auto posInfo   = getExpressionItemPositionInfo(node.nodeValue);
+            // Для AND результат тождественно равен false. 
+            // Для OR  результат тождественно равен true.
+            node.nodeValue = makeBoolExpressionItem(posInfo, nodeValueKind==Kind::opAnd ? false : true );
+            node.argList.clear();
+            return true;
+        };
+
+
+        for(const auto &child: node.argList)
+        {
+            auto isIdent = isIdentNode(child);
+
+            if (isIdent==0)
+                continue;
+
+            StringType name = getIdentNodeString(child);
+            if (name.empty())
+                continue;
+
+            if (isIdent>0) // Прямое вхождение
+            {
+                occurrenceCounters[name].first++;
+                if (occurrenceCounters[name].second>0) // Есть прямое вхождение, и есть инверсное.
+                    return replaceNodeWithBoolConstant();
+
+                if (occurrenceCounters[name].first>1)
+                    hasTheSameVar = true;
+            }
+            else // Инверсное вхождение
+            {
+                occurrenceCounters[name].second++;
+                if (occurrenceCounters[name].first>0) // Есть инверсное вхождение, и есть прямое.
+                    return replaceNodeWithBoolConstant();
+
+                if (occurrenceCounters[name].second>1)
+                    hasTheSameVar = true;
+            }
+        }
+
+        if (!hasTheSameVar)
+            return res;
+
+
+        // У нас есть повтоения
+        // Повторения могут быть как прямые, так и с инверснией
+        // Не может быть вхождения прямого одновременно с инверсным - это мы отсекли ранее
+        // Теперь нам нужно сформировать newArgList из уникальных идентификаторов
+
+        std::vector<ExpressionNodeType> newArgList;
+        std::unordered_set<StringType>  usedIdents;
+
+
+        for(const auto &child: node.argList)
+        {
+            auto isIdent = isIdentNode(child);
+
+            if (isIdent==0)
+            {
+                newArgList.emplace_back(child);
+                continue;
+            }
+
+            StringType name = getIdentNodeString(child);
+            if (name.empty())
+            {
+                newArgList.emplace_back(child);
+                continue;
+            }
+
+            auto it = usedIdents.find(name);
+            if (it!=usedIdents.end())
+                continue; // Пропускаем уже использованный идентификатор
+
+            newArgList.emplace_back(child); // Добавляем в первый раз
+            usedIdents.insert(name); // Помечаем, как использованный
+        }
+
+        node.argList = newArgList;
+
+        return true;
+    }
+
+
+
+    //TODO: Сделать раскрытие скобок
+
+
+    // bool collapseNestedParenthesesImpl(ExpressionNodeType &node) const
+    // {
+    //     bool res = false;
+    //  
+    //     for(auto &childNode: node.argList)
+    //     {
+    //         if (collapseNestedParenthesesImpl(childNode))
+    //             res = true;
+    //     }
+    //  
+    //     auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+    //     if (nodeValueKind!=Kind::opOpen && nodeValueKind!=Kind::opClose)
+    //         return res;
+    //  
+    //     if (node.argList.size()!=1)
+    //         return res;
+    //  
+    //     auto childValueKind = getExpressionItemKind(node.argList[0].nodeValue);
+    //     if (childValueKind!=Kind::opOpen && childValueKind!=Kind::opClose)
+    //         return res;
+    //  
+    //     auto tmpArgList = node.argList[0].argList;
+    //  
+    //     node.argList = tmpArgList;
+    //  
+    //     return true;
+    // }
+
 
 
 
@@ -1421,6 +1704,67 @@ protected: // members
     }
     //getExpressionItemText
 
+    std::size_t countGraphNodes(const ExpressionNodeType &n) const
+    {
+        //std::vector<ExpressionNode>   argList;
+        std::size_t res = 1;
+
+        for(const auto &a: n.argList)
+            res += countGraphNodes(a);
+
+        return res;
+    }
+
+    template<typename StreamType>
+    void gvGraph(StreamType &oss, const ExpressionNodeType &node, std::size_t n) const
+    {
+        oss << "n" << n << ";\n";
+
+        Kind k = Kind::unknown;
+        try
+        {
+            // Kind 
+            k = getExpressionItemKind(node.nodeValue);
+        }
+        catch(...)
+        {
+        }
+
+        std::string label;
+        switch(k)
+        {
+            case Kind::tokenIdent: label = std::string(utils::expressionItemToString(node.nodeValue).c_str()); break;
+            case Kind::opOpen    : label = "( )"  ; break; // label = "(...)"
+            case Kind::opClose   : label = "( )"  ; break; // label = "(...)"
+            case Kind::opNot     : label = "NOT"  ; break;
+            case Kind::opAnd     : label = "AND"  ; break;
+            case Kind::opOr      : label = "OR"   ; break;
+            case Kind::tokenFalse: label = "False"; break;
+            case Kind::tokenTrue : label = "True" ; break;
+            case Kind::unknown: [[fallthrough]];
+            default: label = "<UNKNOWN>";
+        }
+
+        oss << "n" << n << " [label=\"" << label << "\"];\n";
+
+        std::size_t 
+        nextBase = n+1;
+        for(const auto &a: node.argList)
+        {
+            oss << "n" << n << " -- " << "n" << nextBase << ";\n";
+            nextBase += countGraphNodes(a);
+        }
+
+        nextBase = n+1;
+        for(const auto &a: node.argList)
+        {
+            oss.flush();
+            gvGraph(oss, a, nextBase);
+            nextBase += countGraphNodes(a);
+        }
+
+        oss.flush();
+    }
 
 
 public: // ctors
@@ -1439,7 +1783,8 @@ public: // assign
     SimpleBoolExpressionEvaluator& operator=(SimpleBoolExpressionEvaluator &&) = default;
 
 
-public: // members
+public: // simplifications
+
 
     ExpressionNodeType performConstantAbsorption(const ExpressionNodeType &node) const
     {
@@ -1454,6 +1799,72 @@ public: // members
         makeMultiAryImpl(res);
         return res;
     }
+
+    ExpressionNodeType collapseNestedParentheses(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        collapseNestedParenthesesImpl(res);
+        return res;
+    }
+
+    ExpressionNodeType promoteNegations(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        promoteNegationsImpl(res);
+        return res;
+    }
+
+    ExpressionNodeType removeUnnecessaryParentheses(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        removeUnnecessaryParenthesesImpl(res);
+        return res;
+    }
+
+    ExpressionNodeType collapseSameVarsAndObvioslyConstants(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        collapseSameVarsAndObvioslyConstantsImpl(res);
+        return res;
+    }
+
+    // Simplification is not minimization
+    ExpressionNodeType simplify(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+
+        bool done = false;
+        while(!done)
+        {
+            bool bContinue = false;
+
+            if (performConstantAbsorptionImpl(res))
+                bContinue = true;
+
+            if (makeMultiAryImpl(res))
+                bContinue = true;
+
+            if (collapseNestedParenthesesImpl(res))
+                bContinue = true;
+
+            if (promoteNegationsImpl(res))
+                bContinue = true;
+
+            if (removeUnnecessaryParenthesesImpl(res))
+                bContinue = true;
+
+            if (collapseSameVarsAndObvioslyConstantsImpl(res))
+                bContinue = true;
+
+            done = !bContinue;
+        }
+
+        return res;
+    }
+
+
+public: // members
+
 
     template<typename ValueGetter>
     bool evaluate(const ExpressionNodeType &node, ValueGetter valueGetter) const
@@ -1616,6 +2027,37 @@ public: // members
         }
         
     }
+
+    template<typename StreamType>
+    void dump(StreamType &oss) const
+    {
+        MARTY_ARG_USED(oss);
+    }
+
+    template<typename StreamType>
+    void gvGraph(StreamType &oss, const ExpressionNodeType &n, const std::string &label="") const
+    {
+        oss << "graph \"\"\n";
+        oss << "{\n";
+        if (!label.empty())
+        {
+            oss << "label=\"" << label << "\"\n";
+            oss << "labelloc=\"t\";\n";
+        }
+        //oss << "{\n";
+
+        // Убрать try
+        try
+        {
+            gvGraph(oss, n, 0);
+        }
+        catch(...)
+        {}
+
+        oss << "}\n";
+    }
+
+
 
 
 }; // struct SimpleBoolExpressionEvaluator
