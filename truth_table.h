@@ -14,7 +14,7 @@ Fn  X X X X X X X X X X X X X X X X
 
 Для вывода таблицы истинности в горизонтальном виде надо:
 - для каждой переменной в цикле от 0 до stateMax() получить и вывести значение переменной
-Значение переменной извлекаем при помощи ф-ии varGetValue, которая извлекает бит переменной из вектора значений.
+  Значение переменной извлекаем при помощи ф-ии varGetValue, которая извлекает бит переменной из вектора значений.
 
 */
 
@@ -103,25 +103,36 @@ public:
     // void varsStateReset() { m_curVals = 0; }
     // void varsStateNext()  { ++m_curVals; }
 
-    VarsStateType varsStateMax() const
+    VarsStateType varsStateMax(const std::vector<StringType> &vars) const
     {
-        if (m_vars.size()>63u)
+        if (vars.size()>63u)
             throw std::runtime_error("marty::expressions::TruthTable::varsStateMax: too many vars");
 
-        return VarsStateType(1) << int(m_vars.size());
+        return VarsStateType(1) << int(vars.size());
     }
 
-    VarsStateType varGetMask(std::size_t varIdx) const
+    VarsStateType varsStateMax() const
     {
-        if (varIdx >= m_vars.size())
+        return varsStateMax(m_vars);
+    }
+
+    VarsStateType varGetMask(std::size_t varIdx, const std::vector<StringType> &vars) const
+    {
+        if (varIdx >= vars.size())
             throw std::runtime_error("marty::expressions::TruthTable::varGetMask: too big var index");
         return std::uint64_t(1) << int(varIdx);
     }
     
-    std::size_t varGetMaxLen() const
+    VarsStateType varGetMask(std::size_t varIdx) const
+    {
+        return varGetMask(varIdx, m_vars);
+    }
+    
+    //! Возвращает максимальную длину имени переменной
+    std::size_t varGetMaxLen(const std::vector<StringType> &vars) const
     {
         std::size_t m = 0;
-        for(const auto & n : m_vars)
+        for(const auto & n : vars)
         {
             if (n.size()>m)
                 m = n.size();
@@ -130,8 +141,17 @@ public:
         return m;
     }
 
-    std::size_t       varGetNumber() const { return m_vars.size(); }
-    const StringType& varGetName(std::size_t varIdx) const { return m_vars[varIdx]; }
+    //! Возвращает максимальную длину имени переменной из набора TT
+    std::size_t varGetMaxLen() const
+    {
+        return varGetMaxLen(m_vars);
+    }
+
+    std::size_t       varGetNumber(const std::vector<StringType> &vars) const { return vars.size(); }
+    std::size_t       varGetNumber() const { return varGetNumber(m_vars); }
+
+    const StringType& varGetName(std::size_t varIdx, const std::vector<StringType> &vars) const { return vars[varIdx]; }
+    const StringType& varGetName(std::size_t varIdx) const { return varGetName(m_vars, varIdx); }
 
     std::size_t varGetNameFillSize(const StringType &vn, std::size_t maxNameLen) const
     {
@@ -151,10 +171,20 @@ public:
         return StringType(fillSz, ' ');
     }
 
+    // const std::vector<StringType> &vars
+
     std::size_t varGetIndex(const StringType &varName) const
     {
         auto it = m_varIndices.find(varName);
         if (it==m_varIndices.end())
+            return std::size_t(-1);
+        return it->second;
+    }
+
+    std::size_t varGetIndex(const StringType &varName, const std::vector<StringType> &vars) const
+    {
+        auto it = std::find(vars.begin(), vars.end(), varName);
+        if (it==vars.end())
             return std::size_t(-1);
         return it->second;
     }
@@ -165,10 +195,22 @@ public:
         return (varsState & mask) != 0;
     }
     
+    bool varGetValue(std::size_t varIdx, VarsStateType varsState, const std::vector<StringType> &vars) const
+    {
+        auto mask = varGetMask(varIdx, vars);
+        return (varsState & mask) != 0;
+    }
+    
     bool varGetValue(const StringType &varName, VarsStateType varsState) const
     {
         auto it = m_varIndices.find(varName);
         return it==m_varIndices.end() ? false : varGetValue(it->second, varsState);
+    }
+
+    bool varGetValue(const StringType &varName, VarsStateType varsState, const std::vector<StringType> &vars) const
+    {
+        auto it = std::find(vars.begin(), vars.end(), varName);
+        return it==vars.end() ? false : varGetValue(std::size_t(it-vars.begin()), varsState, vars);
     }
 
     VarsStateType varSetValue(std::size_t varIdx, VarsStateType varsState, bool b) const
@@ -353,6 +395,38 @@ public:
     TruthTable& operator|= (const TruthTable &ttOther)       { *this = merge(ttOther); return *this; }
     // TruthTable& operator||=(const TruthTable &ttOther)       { *this = merge(ttOther); return *this; } // Нет такого оператора в плюсиках
     TruthTable& operator+= (const TruthTable &ttOther)       { *this = merge(ttOther); return *this; }
+
+
+    template<typename StreamType>
+    StreamType& print(StreamType &oss, const std::vector<StringType> &vars) const
+    {
+        auto maxVarLen  = varGetMaxLen(vars);
+        if (maxVarLen<3)
+            maxVarLen = 3;
+
+        std::size_t numVars = varGetNumber(vars);
+        for(std::size_t varIdx=0; varIdx!=numVars; ++varIdx)
+        {
+            auto varName = varGetName(varIdx, vars);
+            oss <<  /* "    " << */ varName << varGetNameFill(varName, maxVarLen) << " :" << " ";
+            VarsStateType vsMax = varsStateMax(vars);
+            for(TruthTable::VarsStateType vs=0u; vs!=vsMax; ++vs)
+                oss << varGetValue(varIdx, vs, vars);
+            oss << "\n";
+        }
+
+        return oss;
+    }
+
+    template<typename StreamType>
+    StreamType& print(StreamType &oss) const
+    {
+        return print(oss, m_vars);
+    }
+
+    // std::vector<StringType>                           m_vars;
+
+
 
 
 }; // struct TruthTable

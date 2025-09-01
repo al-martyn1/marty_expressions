@@ -1080,6 +1080,13 @@ protected: // members
         return true;
     }
 
+    void invertNodeAndOrOperator(ExpressionNodeType &node, Kind nk) const
+    {
+        auto &opNode = std::get<OperatorType>(node.nodeValue);
+        opNode.value = nk==Kind::opAnd ? m_opTraits.orOp : m_opTraits.andOp;
+        opNode.text  = nk==Kind::opAnd ?       "|"       :       "&"       ;
+    }
+
     // Продвинуть отрицания (Привести к нормальной форме отрицания)
     // Promote Negations (Bring to Normal Form of Negation)
     bool promoteNegationsImpl2(ExpressionNodeType &node) const
@@ -1091,13 +1098,6 @@ protected: // members
             if (promoteNegationsImpl(childNode))
                 res = true;
         }
-
-        auto invertNodeOperator = [&](ExpressionNodeType &n, Kind nk)
-        {
-            auto &opNode = std::get<OperatorType>(n.nodeValue);
-            opNode.value = nk==Kind::opAnd ? m_opTraits.orOp : m_opTraits.andOp;
-            opNode.text  = nk==Kind::opAnd ?       "|"       :       "&"       ;
-        };
 
         auto promoteImpl = [&]( ExpressionNodeType notNodeTpl, std::vector<ExpressionNodeType> &argList )
         {
@@ -1136,7 +1136,8 @@ protected: // members
 
             // Тут у нас либо AND, либо OR
 
-            invertNodeOperator(parenthesesNode, parenthesesNodeValueKind);
+            invertNodeAndOrOperator(parenthesesNode, parenthesesNodeValueKind);
+            //invertNodeOperator(parenthesesNode, parenthesesNodeValueKind);
 
             promoteImpl(node, parenthesesNode.argList);
             node = ExpressionNodeType(parenthesesNode);
@@ -1163,7 +1164,7 @@ protected: // members
             return true;
         }
 
-        invertNodeOperator(parenthesesChildNode, parenthesesChildNodeValueKind);
+        invertNodeAndOrOperator(parenthesesChildNode, parenthesesChildNodeValueKind);
         promoteImpl(node, parenthesesChildNode.argList);
 
         node = ExpressionNodeType(parenthesesNode);
@@ -1178,10 +1179,6 @@ protected: // members
             ++cnt;
         return cnt!=0;
     }
-
-    // Схлопывание двойных отрицаний
-    // Collapsing Double Negations
-    // Реализовано в promoteNegations
 
     bool removeUnnecessaryParenthesesImpl(ExpressionNodeType &node) const
     {
@@ -1379,6 +1376,61 @@ protected: // members
         return true;
     }
 
+    //! Возвращает 0, если не идентификатор, 1 - если идентификатор, и -1, если идентификатор с отрицанием
+    bool isValidNegationNode(const ExpressionNodeType &node) const
+    {
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind!=Kind::opNot) 
+            return false;
+
+        if (node.argList.size()!=1)
+            return false; // Отрицание, но некорректное число потомков
+
+        return true;
+    }
+
+    bool convertNegativeOperandsImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (convertNegativeOperandsImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+
+        if (nodeValueKind!=Kind::opAnd && nodeValueKind!=Kind::opOr)
+            return res;
+
+        bool allNegatives = true;
+
+        for(auto &child: node.argList)
+        {
+            if (!isValidNegationNode(child))
+            {
+                allNegatives = false;
+                break;
+            }
+        }
+
+        if (!allNegatives)
+            return res;
+
+        // node = ExpressionNodeType(parenthesesNode.argList[0]);
+
+        invertNodeAndOrOperator(node, nodeValueKind);
+
+        for(auto &child: node.argList)
+        {
+            child = ExpressionNodeType(child.argList[0]);
+        }
+
+        return res;
+    }
+
+
     // Окружаем узел скобками
     void addParenthesesImpl(ExpressionNodeType &node) const
     {
@@ -1427,44 +1479,12 @@ protected: // members
 
     PositionInfoType getPositionInfo(const ExpressionItemType &v) const
     {
-        return std::visit( [&](const auto &a) -> PositionInfoType
-                           {
-                               using ArgType = std::decay_t<decltype(a)>;
-
-                               if constexpr (std::is_same_v <ArgType, OperatorType >)            return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, BoolLiteralType >)    return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, IntegerLiteralType >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, FloatingPointLiteral<PositionInfoType, FloatingPointType> >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, StringLiteral<PositionInfoType, StringType>               >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, SymbolLiteral<PositionInfoType, StringType>               >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >) return a.positionInfo;
-                               // if constexpr (std::is_same_v <ArgType, ExpressionEntry<PositionInfoType>                         >) return ItemType::expressionEntry     ;
-                               else if constexpr (std::is_same_v <ArgType, FunctionCall<PositionInfoType, StringType>                >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, FunctionalCast<PositionInfoType, StringType>              >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, Cast<PositionInfoType, StringType>                        >) return a.positionInfo;
-                               else if constexpr (std::is_same_v <ArgType, VoidValue<PositionInfoType, StringType>                   >) return a.positionInfo;
-
-                               else 
-                                   return PositionInfoType{};
-                           }
-                         , v
-                         );
+           return getExpressionItemPositionInfo(v);
     }
 
     StringType getExpressionItemText(const ExpressionItemType &v) const
     {
-        return std::visit( [&](const auto &a) -> StringType
-                           {
-                               using ArgType = std::decay_t<decltype(a)>;
-
-                               if constexpr (std::is_same_v <ArgType, IdentifierLiteralType >)
-                                   return a.value;
-                               else 
-                                   return StringType();
-                           }
-                         , v
-                         );
-    
+        return getExpressionItemString(v);
     }
 
     static
@@ -1627,6 +1647,13 @@ public: // simplifications
         return res;
     }
 
+    ExpressionNodeType convertNegativeOperands(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        convertNegativeOperandsImpl(res);
+        return res;
+    }
+
     // Simplification is not minimization
     ExpressionNodeType simplify(const ExpressionNodeType &node) const
     {
@@ -1653,6 +1680,9 @@ public: // simplifications
                 bContinue = true;
 
             if (collapseSameVarsAndObvioslyConstantsImpl(res))
+                bContinue = true;
+
+            if (convertNegativeOperandsImpl(res))
                 bContinue = true;
 
             done = !bContinue;
@@ -1711,6 +1741,19 @@ public: // members
 
         return res;
     }
+
+    void getExpressionVars(ExpressionNodeType node, std::set<StringType> &s) const
+    {
+        s = getExpressionVars(node);
+    }
+
+    void getExpressionVars(ExpressionNodeType node, std::vector<StringType> &v) const
+    {
+        v.clear();
+        auto s = getExpressionVars(node);
+        v.insert(v.end(), s.begin(), s.end());
+    }
+
 
     TruthTable<StringType> makeTruthTable(const ExpressionNodeType &node) const
     {
