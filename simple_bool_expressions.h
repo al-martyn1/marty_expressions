@@ -34,15 +34,15 @@ namespace expressions {
 enum class SimpleBoolExpressionItemKind
 {
     unknown,
-    opOpen,
-    opClose,
+    tokenFalse,
+    tokenTrue,
+    tokenIdent,
     opNot,
     opAnd,
     // opXor,
     opOr,
-    tokenIdent,
-    tokenFalse,
-    tokenTrue
+    opOpen,
+    opClose
 };
 
 //----------------------------------------------------------------------------
@@ -1261,7 +1261,7 @@ protected: // members
         if (childValueKind==Kind::tokenIdent)
             return getExpressionItemString(child.nodeValue);
 
-        return StringType();
+        return StringType(); // Что-то пошло не так
     }
 
 
@@ -1474,8 +1474,122 @@ protected: // members
         return res;
     }
 
+    StringType internalGetNodeTextForSorting(const ExpressionNodeType &node) const
+    {
+        auto nodeKind = getExpressionItemKind(node.nodeValue);
 
-    //TODO: Сделать раскрытие скобок
+        if (nodeKind==Kind::tokenIdent || nodeKind==Kind::opNot)
+        {
+            // А нужно ли отрицание добавлять при формировании строки для сорта?
+            // Всё равно, в симплифицированном выражении прямое и обратное вхождения невозможны
+            return getIdentNodeString(node); // оно само умеет в NOT
+        }
+
+        // Тут что-то может пойти не так, но обычно у приоритизирующих скобок
+        // ровно один аргумент. Ассерты лень вставлять
+        if (nodeKind==Kind::opOpen || nodeKind==Kind::opClose)
+           return StringType("(") + internalGetNodeTextForSorting(node.argList[0]) + StringType(")");
+
+        // Тут бы лучше, если вокруг OR были уже расставлены приоритизирующие скобки.
+        // Но если их нет, то наверное пережить можно.
+        // А лучше - явно добавить, просто будут двойные скобки, если что
+        if (nodeKind==Kind::opAnd || nodeKind==Kind::opOr)
+        {
+            StringType res;
+            for(auto &childNode: node.argList)
+            {
+                if (!res.empty())
+                {
+                    res += StringType(nodeKind==Kind::opAnd ? "&" : "|");
+                }
+
+                res.append(internalGetNodeTextForSorting(childNode));
+
+            }
+            return StringType("(") + res + StringType(")");
+        }
+
+        if (nodeKind==Kind::tokenFalse)
+           return StringType("0");
+
+        if (nodeKind==Kind::tokenTrue)
+           return StringType("1");
+
+        return StringType(); // Что-то пошло не так
+    }
+
+    // internalGetNodeTextForSorting
+
+    void sortArgumentsImpl(ExpressionNodeType &node) const
+    {
+        //bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            auto childKind = getExpressionItemKind(childNode.nodeValue);
+            if (childKind==Kind::tokenIdent || childKind==Kind::opNot)
+                continue; // идентификатор и отрицание сортировать бесполезно
+
+            sortArgumentsImpl(childNode);
+            // if (sortArgumentsImpl(childNode))
+            //     res = true;
+        }
+
+        auto nodeLess = [&](const ExpressionNodeType &n1, const ExpressionNodeType &n2)
+        {
+            auto nk1 = getExpressionItemKind(n1.nodeValue);
+            auto nk2 = getExpressionItemKind(n2.nodeValue);
+        
+            if (nk1==nk2)
+                return internalGetNodeTextForSorting(n1) < internalGetNodeTextForSorting(n2);
+
+            if ( (nk1==Kind::tokenIdent || nk1==Kind::opNot)
+              && (nk2==Kind::tokenIdent || nk2==Kind::opNot)
+               )
+                return internalGetNodeTextForSorting(n1) < internalGetNodeTextForSorting(n2);
+
+            return (unsigned)nk1 < (unsigned)nk2;
+        };
+
+        std::sort(node.argList.begin(), node.argList.end(), nodeLess);
+    }
+
+
+// enum class SimpleBoolExpressionItemKind
+// {
+//     unknown,
+//     opOpen,
+//     opClose,
+//     opNot,
+//     opAnd,
+//     // opXor,
+//     opOr,
+//     tokenIdent,
+//     tokenFalse,
+//     tokenTrue
+// };
+
+
+    // StringType getIdentNodeString(const ExpressionNodeType &node) const
+    // {
+    //     auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+    //     if (nodeValueKind==Kind::tokenIdent) 
+    //         return getExpressionItemString(node.nodeValue);
+    //  
+    //     if (nodeValueKind!=Kind::opNot)
+    //         return StringType();
+    //     
+    //     if (node.argList.size()!=1)
+    //         return StringType();
+    //  
+    //     auto &child = node.argList[0];
+    //     auto childValueKind = getExpressionItemKind(child.nodeValue);
+    //     if (childValueKind==Kind::tokenIdent)
+    //         return getExpressionItemString(child.nodeValue);
+    //  
+    //     return StringType(); // Что-то пошло не так
+    // }
+
 
     PositionInfoType getPositionInfo(const ExpressionItemType &v) const
     {
@@ -1654,6 +1768,13 @@ public: // simplifications
         return res;
     }
 
+    ExpressionNodeType sortArguments(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        sortArgumentsImpl(res);
+        return res;
+    }
+
     // Simplification is not minimization
     ExpressionNodeType simplify(const ExpressionNodeType &node) const
     {
@@ -1689,6 +1810,7 @@ public: // simplifications
         }
 
         collapseNestedParenthesesImpl(res);
+        sortArgumentsImpl(res);
         addRequiredParenthesesImpl(res);
 
         return res;
