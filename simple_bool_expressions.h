@@ -1212,7 +1212,19 @@ protected: // members
                 continue;
 
             if (nodeValueKind!=childChildNodeValueKind)
+            {
+                if (nodeValueKind==Kind::opOr && childChildNodeValueKind==Kind::opAnd)
+                {
+                    childNode = ExpressionNodeType(childChildNode);
+                    continue;
+                }
+                if (nodeValueKind==Kind::opAnd && childChildNodeValueKind==Kind::opOr)
+                {
+                    childNode = ExpressionNodeType(childChildNode);
+                    continue;
+                }
                 continue;
+            }
 
             childNode = ExpressionNodeType(childChildNode);
 
