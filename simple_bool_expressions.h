@@ -1080,6 +1080,27 @@ protected: // members
         return true;
     }
 
+    bool removeAllParenthesesImpl(ExpressionNodeType &node) const
+    {
+        bool res = false;
+
+        for(auto &childNode: node.argList)
+        {
+            if (removeAllParenthesesImpl(childNode))
+                res = true;
+        }
+
+        auto nodeValueKind = getExpressionItemKind(node.nodeValue);
+        if (nodeValueKind!=Kind::opOpen && nodeValueKind!=Kind::opClose)
+            return res;
+
+        if (node.argList.size()!=1)
+            return res;
+
+        node = ExpressionNodeType(node.argList[0]);
+        return true;
+    }
+
     void invertNodeAndOrOperator(ExpressionNodeType &node, Kind nk) const
     {
         auto &opNode = std::get<OperatorType>(node.nodeValue);
@@ -1349,7 +1370,7 @@ protected: // members
             return res;
 
 
-        // У нас есть повтоения
+        // У нас есть повторения
         // Повторения могут быть как прямые, так и с инверснией
         // Не может быть вхождения прямого одновременно с инверсным - это мы отсекли ранее
         // Теперь нам нужно сформировать newArgList из уникальных идентификаторов
@@ -1566,43 +1587,6 @@ protected: // members
         std::sort(node.argList.begin(), node.argList.end(), nodeLess);
     }
 
-
-// enum class SimpleBoolExpressionItemKind
-// {
-//     unknown,
-//     opOpen,
-//     opClose,
-//     opNot,
-//     opAnd,
-//     // opXor,
-//     opOr,
-//     tokenIdent,
-//     tokenFalse,
-//     tokenTrue
-// };
-
-
-    // StringType getIdentNodeString(const ExpressionNodeType &node) const
-    // {
-    //     auto nodeValueKind = getExpressionItemKind(node.nodeValue);
-    //     if (nodeValueKind==Kind::tokenIdent) 
-    //         return getExpressionItemString(node.nodeValue);
-    //  
-    //     if (nodeValueKind!=Kind::opNot)
-    //         return StringType();
-    //     
-    //     if (node.argList.size()!=1)
-    //         return StringType();
-    //  
-    //     auto &child = node.argList[0];
-    //     auto childValueKind = getExpressionItemKind(child.nodeValue);
-    //     if (childValueKind==Kind::tokenIdent)
-    //         return getExpressionItemString(child.nodeValue);
-    //  
-    //     return StringType(); // Что-то пошло не так
-    // }
-
-
     PositionInfoType getPositionInfo(const ExpressionItemType &v) const
     {
            return getExpressionItemPositionInfo(v);
@@ -1745,6 +1729,13 @@ public: // simplifications
         return res;
     }
 
+    ExpressionNodeType removeAllParentheses(const ExpressionNodeType &node) const
+    {
+        auto res = node;
+        removeAllParenthesesImpl(res);
+        return res;
+    }
+
     ExpressionNodeType promoteNegations(const ExpressionNodeType &node) const
     {
         auto res = node;
@@ -1803,7 +1794,10 @@ public: // simplifications
             if (makeMultiAryImpl(res))
                 bContinue = true;
 
-            if (collapseNestedParenthesesImpl(res))
+            // if (collapseNestedParenthesesImpl(res))
+            //     bContinue = true;
+
+            if (removeAllParenthesesImpl(res))
                 bContinue = true;
 
             if (promoteNegationsImpl(res))
@@ -1827,6 +1821,37 @@ public: // simplifications
 
         return res;
     }
+
+    // To get DNF (Disjunctive Normal Form) or CNF (Conjunctive Normal Form), you need to use distributive laws (distributive laws).
+    // distributivity of OR with respect to AND:
+    // дистрибутивность И относительно ИЛИ: A & (B ∨ C) ≡ (A & B) ∨ (A & C)
+    // дистрибутивность ИЛИ относительно И: A ∨ (B & C) ≡ (A ∨ B) & (A ∨ C)
+
+    // Тестовая формула: o|p|q | (a1|b1&c)&(a2|b2|e&!f&g&h) | e&f&g&h
+    // дистрибутивность И относительно ИЛИ: (a1|b1&c)&(a2|b2|e&!f&g&h) = (a1|b1&c)&a2 | (a1|b1&c)&b2 | (a1|b1&c)&(e&!f&g&h)
+
+    // дистрибутивность ИЛИ относительно И
+
+    //       OR                 AND                      AND
+    //     /    \            /       \          /      /     \       \
+    //   AND    AND         OR       OR       OR      OR      OR      OR
+    //  /  \   /  \        /  \     /  \     /  \    /  \    /  \    /  \
+    //  A  B   C  D      AND   C  AND   D    A  C    B  C    A  D    B  D
+    //                  /  \     /  \    
+    //                  A  B     A  B    
+      
+    // (A&B) | (C&D) = (A&B)|C & (A&B)|D = A|C & B|C & A|D & B|D
+    // (A&B)|C = A|C & B|C
+    // (A&B)|D = A|D & B|D
+
+    // a1 | b1&c = a1|b1 & a1|c
+    //  
+    //     OR
+    //    /  \
+    //  a1   AND
+    //      /   \
+    //     b1   c
+    //  
 
 
 public: // members
