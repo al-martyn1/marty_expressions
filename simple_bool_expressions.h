@@ -157,7 +157,12 @@ public: // depended types
     using operation_info_type         = OperationInfoType;
 
 
-    using Kind = SimpleBoolExpressionItemKind;
+    using kind_type = SimpleBoolExpressionItemKind;
+    using KindType  = SimpleBoolExpressionItemKind;
+    using Kind      = SimpleBoolExpressionItemKind;
+
+    using error_type = Error;
+    using ErrorType  = Error;
 
 
 public: // member types
