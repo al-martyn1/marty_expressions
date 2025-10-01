@@ -605,9 +605,20 @@ checkConvertOperatorToken( ExpressionInputItem<PositionInfoType, OperatorTokenTy
                     if constexpr (std::is_same_v< std::decay_t<decltype(val)>, typename TokenizerType::StringLiteralDataHolder>)
                         operatorText = val.pData->value;
 
+                    else if constexpr (std::is_same_v< std::decay_t<decltype(val)>, typename TokenizerType::OperatorDataHolder>)
+                        operatorText = val.pData->value;
+
                     // !!! Надо подумать, как получить текст, если у нас нет полезной нагрузки, и нет итераторов
                     // else
                     //     operatorText = umba::tokenizer::utils::makeTokenText(tokenType, b, e);
+
+
+    // std::string extractIdentifierName(const TokenInfoType *pTokenInfo)
+    // {
+    //     auto pTokenParsedData = BaseClass::getTokenParsedDataPtr(pTokenInfo);
+    //     auto identifierData = std::get<typename TokenizerType::IdentifierDataHolder>(*pTokenParsedData);
+    //     return identifierData.pData->value;
+    // }
 
                     resItem = marty::expressions::Operator<PositionInfoType,OperatorTokenType,StringType>{posInfo, tokenType, operatorText};
                     bRes = true;
