@@ -58,7 +58,7 @@ ExpressionParser<OperatorTraitsTypeT, PositionInfoTypeT, OperatorTokenTypeT, Int
 initialize()
 {
     m_stateHandler = &ExpressionParser::waitUnaryPrefixOperatorOrValue;
-    m_expression.nodeValue = IntegerLiteralType{PositionInfoType{}, IntegerType{0}};
+    m_expression.nodeValue = IntegerLiteralType{PositionInfoType{}, IntegerType{0}, StringTypeT{}};
     m_expression.argList.clear();
     m_ops.clear();
     m_operands.clear();

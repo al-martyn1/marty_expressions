@@ -261,7 +261,7 @@ protected: // helpers
 
     ExpressionNodeType expressionItemToNode(const ExpressionItemType &v)
     {
-        return ExpressionNodeType{v}; // Заполняется только nodeValue
+        return ExpressionNodeType{v, {}}; // Заполняется только nodeValue
     }
 
     void pushOperator(const ExpressionItemType &v)
@@ -319,7 +319,7 @@ protected: // helpers
                 // Запихиваем value не как value, а как операторныую ноду с одним аргументом value
 
                 // Задаём nodeValue восстановленным из оператора ExpressionItemType
-                auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()} };
+                auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()}, {} };
 
                 // Задаём аффиксность и арность
                 // Это нужно для вычислителя выражений
@@ -367,7 +367,7 @@ protected: // helpers
             return false; // Но нет для AND операндов - это какая-то беда
 
         // Всё нормас, можно делать. Из оператора на вершине стека операторов взяли оператор (AND) и сделали из него ноду
-        auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()} };
+        auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()}, {} };
         // Задаём аффиксность и арность
         // Это нужно для вычислителя выражений
         node.affixation = OperatorAffixation::none; //  none/prefix/postfix
@@ -398,7 +398,7 @@ protected: // helpers
             return false; // Но нет для OR операндов - это какая-то беда
 
         // Всё нормас, можно делать. Из оператора на вершине стека операторов взяли оператор (AND) и сделали из него ноду
-        auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()} };
+        auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()}, {} };
         // Задаём аффиксность и арность
         // Это нужно для вычислителя выражений
         node.affixation = OperatorAffixation::none; //  none/prefix/postfix
@@ -436,7 +436,7 @@ protected: // helpers
                 if (m_varStack.size()<1)
                     return false; // какая-то беда
 
-                auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()} };
+                auto node = ExpressionNodeType{ ExpressionItemType{m_opStack.back()}, {} };
                 node.affixation = OperatorAffixation::none; //  none/prefix/postfix
                 node.arity      = OperatorArity::unary;     // unary/binary/etc    
                 node.argList.emplace_back(m_varStack.back());
@@ -1837,13 +1837,13 @@ public: // simplifications
 
     // дистрибутивность ИЛИ относительно И
 
-    //       OR                 AND                      AND
-    //     /    \            /       \          /      /     \       \
-    //   AND    AND         OR       OR       OR      OR      OR      OR
-    //  /  \   /  \        /  \     /  \     /  \    /  \    /  \    /  \
-    //  A  B   C  D      AND   C  AND   D    A  C    B  C    A  D    B  D
-    //                  /  \     /  \    
-    //                  A  B     A  B    
+    //       OR                 AND                      AND                |
+    //     /    \            /       \          /      /     \       \      |
+    //   AND    AND         OR       OR       OR      OR      OR      OR    |
+    //  /  \   /  \        /  \     /  \     /  \    /  \    /  \    /  \   | 
+    //  A  B   C  D      AND   C  AND   D    A  C    B  C    A  D    B  D   |
+    //                  /  \     /  \                                       |
+    //                  A  B     A  B                                       |
       
     // (A&B) | (C&D) = (A&B)|C & (A&B)|D = A|C & B|C & A|D & B|D
     // (A&B)|C = A|C & B|C
@@ -1851,11 +1851,11 @@ public: // simplifications
 
     // a1 | b1&c = a1|b1 & a1|c
     //  
-    //     OR
-    //    /  \
-    //  a1   AND
-    //      /   \
-    //     b1   c
+    //     OR         |
+    //    /  \        |
+    //  a1   AND      |
+    //      /   \     |
+    //     b1   c     |
     //  
 
 

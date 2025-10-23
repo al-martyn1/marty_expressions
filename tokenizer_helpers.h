@@ -83,9 +83,9 @@ checkConvertIdentifier( ExpressionInputItem<PositionInfoType, OperatorTokenType,
                       , const IdentifierConvertTraits<StringType> &identConvertTraits = IdentifierConvertTraits<StringType>()
                       )
 {
-    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST    && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST
-        || tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST      && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST
-        || tokenType>=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_LAST
+    if (!( (tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST    && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST   )
+        || (tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST      && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST     )
+        || (tokenType>=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_LAST)
        ))
        return false;
 
@@ -167,9 +167,9 @@ checkConvertIdentifier( ExpressionInputItem<PositionInfoType, OperatorTokenType,
                       , const IdentifierConvertTraits<StringType> &identConvertTraits = IdentifierConvertTraits<StringType>()
                       )
 {
-    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST    && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST
-        || tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST      && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST
-        || tokenType>=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_LAST
+    if (!( (tokenType>=UMBA_TOKENIZER_TOKEN_IDENTIFIER_FIRST    && tokenType<=UMBA_TOKENIZER_TOKEN_IDENTIFIER_LAST   )
+        || (tokenType>=UMBA_TOKENIZER_TOKEN_KEYWORDS_FIRST      && tokenType<=UMBA_TOKENIZER_TOKEN_KEYWORDS_LAST     )
+        || (tokenType>=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_FIRST && tokenType<=UMBA_TOKENIZER_TOKEN_LITERAL_KNOWN_LAST)
        ))
        return false;
 
@@ -543,12 +543,12 @@ checkConvertOperatorToken( ExpressionInputItem<PositionInfoType, OperatorTokenTy
                          , PositionInfoGeneratorType positionInfoGenerator
                          )
 {
-    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_OPERATOR_FIRST         && tokenType<=UMBA_TOKENIZER_TOKEN_OPERATOR_LAST
-        || tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN    || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE    
-        || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE 
+    if (!( ((tokenType>=UMBA_TOKENIZER_TOKEN_OPERATOR_FIRST        ) && (tokenType<=UMBA_TOKENIZER_TOKEN_OPERATOR_LAST          ))
+        ||  (tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN    ) || (tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE    ) 
+        ||  (tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN    ) || (tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE    ) 
+        ||  (tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN    ) || (tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE    ) 
+        ||  (tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN   ) || (tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE   ) 
+        ||  (tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN) || (tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE)
        ))
        return false;
     
@@ -587,12 +587,12 @@ checkConvertOperatorToken( ExpressionInputItem<PositionInfoType, OperatorTokenTy
                          , const TokenParsedDataType &parsedData
                          )
 {
-    if (!( tokenType>=UMBA_TOKENIZER_TOKEN_OPERATOR_FIRST         && tokenType<=UMBA_TOKENIZER_TOKEN_OPERATOR_LAST
-        || tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE     
-        || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN    || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE    
-        || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE 
+    if (!( (tokenType>=UMBA_TOKENIZER_TOKEN_OPERATOR_FIRST         && tokenType<=UMBA_TOKENIZER_TOKEN_OPERATOR_LAST          )
+        || (tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_CURLY_BRACKET_CLOSE    ) 
+        || (tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ROUND_BRACKET_CLOSE    ) 
+        || (tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_OPEN     || tokenType==UMBA_TOKENIZER_TOKEN_ANGLE_BRACKET_CLOSE    ) 
+        || (tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_OPEN    || tokenType==UMBA_TOKENIZER_TOKEN_SQUARE_BRACKET_CLOSE   ) 
+        || (tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_OPEN || tokenType==UMBA_TOKENIZER_TOKEN_DBLSQUARE_BRACKET_CLOSE)
        ))
        return false;
     

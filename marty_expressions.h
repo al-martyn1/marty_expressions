@@ -4,7 +4,7 @@
  */
 #pragma once
 
-// Старое тут - F:\tmp\2\omf51_1\omf51\src\
+// Старое тут - F:\tmp\2\omf51_1\omf51\src
 
 
 /*
@@ -195,7 +195,7 @@ public: // ctors
     , m_opFeatures(features | OperatorFeatures::regular) // regular operators are always supported
     , m_stateHandler(&ExpressionParser::waitUnaryPrefixOperatorOrValue)
     {
-        m_expression.nodeValue = IntegerLiteralType{PositionInfoType{}, IntegerType{0}};
+        m_expression.nodeValue = IntegerLiteralType{PositionInfoType{}, IntegerType{0}, StringType{}};
     }
 
     ExpressionParser(const ExpressionParser &) = default;
