@@ -53,8 +53,8 @@ namespace expressions {
 template<typename PositionInfoType>
 struct BoolLiteral
 {
-    PositionInfoType     positionInfo;
-    bool                 value;
+    PositionInfoType     positionInfo = {};
+    bool                 value = false;
 
 }; // BoolLiteral
 
@@ -62,9 +62,9 @@ struct BoolLiteral
 template<typename PositionInfoType, typename IntegerType=MARTY_EXPRESSIONS_DEFAULT_INTEGER_LITERAL_VALUE_TYPE, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct IntegerLiteral
 {
-    PositionInfoType     positionInfo;
-    IntegerType          value;
-    StringType           suffix;
+    PositionInfoType     positionInfo = {};
+    IntegerType          value = {};
+    StringType           suffix = {};
 
 }; // IntegerLiteral
 
@@ -72,9 +72,9 @@ struct IntegerLiteral
 template<typename PositionInfoType, typename FloatingPointType=MARTY_EXPRESSIONS_DEFAULT_FLOATING_POINT_LITERAL_VALUE_TYPE, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct FloatingPointLiteral
 {
-    PositionInfoType     positionInfo;
-    FloatingPointType    value;
-    StringType           suffix;
+    PositionInfoType     positionInfo = {};
+    FloatingPointType    value = {};
+    StringType           suffix = {};
 
 }; // FloatingPointLiteral
 
@@ -82,9 +82,9 @@ struct FloatingPointLiteral
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct StringLiteral
 {
-    PositionInfoType     positionInfo;
-    StringType           value;
-    StringType           suffix;
+    PositionInfoType     positionInfo = {};
+    StringType           value = {};
+    StringType           suffix = {};
 
 }; // StringLiteral
 
@@ -92,9 +92,9 @@ struct StringLiteral
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct SymbolLiteral
 {
-    PositionInfoType     positionInfo;
-    StringType           value;
-    StringType           suffix;
+    PositionInfoType     positionInfo = {};
+    StringType           value = {};
+    StringType           suffix = {};
 
 }; // SymbolLiteral
 
@@ -102,8 +102,8 @@ struct SymbolLiteral
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct IdentifierLiteral
 {
-    PositionInfoType     positionInfo;
-    StringType           value; // !!! сделать вектор
+    PositionInfoType     positionInfo = {};
+    StringType           value = {}; // !!! сделать вектор
 
 }; // IdentifierLiteral
 
@@ -111,9 +111,9 @@ struct IdentifierLiteral
 template<typename PositionInfoType, typename OperatorTokenType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct Operator
 {
-    PositionInfoType     positionInfo;
-    OperatorTokenType    value;
-    StringType           text;
+    PositionInfoType     positionInfo = {};
+    OperatorTokenType    value = {};
+    StringType           text = {};
 
 }; // Operator
 
@@ -129,7 +129,7 @@ struct Operator
 template<typename PositionInfoType>
 struct ExpressionEntry
 {
-    PositionInfoType     positionInfo;
+    PositionInfoType     positionInfo = {};
 
     // !!! Добавить тип скобки
 
@@ -139,8 +139,8 @@ struct ExpressionEntry
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct FunctionCall
 {
-    PositionInfoType     positionInfo;
-    StringType           value; // function name // !!! сделать вектор
+    PositionInfoType     positionInfo = {};
+    StringType           value = {}; // function name // !!! сделать вектор
 
     // !!! Надо как-то пометить окончание - пустое имя?
 
@@ -150,8 +150,8 @@ struct FunctionCall
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct FunctionalCast
 {
-    PositionInfoType     positionInfo;
-    StringType           value; // type name // !!! сделать вектор
+    PositionInfoType     positionInfo = {};
+    StringType           value = {}; // type name // !!! сделать вектор
 
     // !!! Надо как-то пометить окончание - пустое имя?
 
@@ -162,8 +162,8 @@ struct FunctionalCast
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct Cast
 {
-    PositionInfoType     positionInfo;
-    StringType           value; // type name // !!! сделать вектор
+    PositionInfoType     positionInfo = {};
+    StringType           value = {}; // type name // !!! сделать вектор
 
 }; // Cast
 
@@ -171,8 +171,8 @@ struct Cast
 template<typename PositionInfoType, typename StringType=MARTY_EXPRESSIONS_DEFAULT_STRING_LITERAL_VALUE_TYPE>
 struct VoidValue
 {
-    PositionInfoType     positionInfo;
-    StringType           value; // for uniformity
+    PositionInfoType     positionInfo = {};
+    StringType           value = {}; // for uniformity
 
 }; // VoidValue
 
